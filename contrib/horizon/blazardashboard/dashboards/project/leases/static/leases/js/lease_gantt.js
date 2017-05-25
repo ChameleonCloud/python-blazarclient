@@ -4,10 +4,30 @@
   function init() {
     var gantt;
     var tasks;
+    var hosts;
     var form;
+
+    var format = '%d-%b %H:%M';
+    var taskStatus = {
+      'active': 'task-active',
+      'pending': 'task-pending'
+    };
 
     $.getJSON('../calendar.json')
     .done(function(resp) {
+      var nodeTypesPretty = [ // preserve order so it's not random
+        ['compute', 'Compute Node'],
+        ['storage', 'Storage'],
+        ['gpu_k80', 'GPU (K80)'],
+        ['gpu_m40', 'GPU (M40)'],
+        ['gpu_p100', 'GPU (P100)'],
+        ['compute_ib', 'Infiniband Support'],
+        ['storage_hierarchy', 'Storage Hierarchy'],
+        ['fpga', 'FPGA'],
+        ['lowpower_xeon', 'Low power Xeon'],
+        ['atom', 'Atom'],
+        ['arm64', 'ARM64'],
+      ];
 
       tasks = resp.reservations.map(function(reservation, i) {
         reservation.hosts = resp.reservations.filter(
@@ -26,16 +46,24 @@
         }
       });
 
-      var taskStatus = {
-        'active': 'task-active',
-        'pending': 'task-pending'
-      };
+      hosts = resp.compute_hosts;
+
+      // populate node-type-chooser
+      var availableNodeTypes = {};
+      hosts.forEach(function(host) {
+          availableNodeTypes[host.node_type] = true;
+      });
+      nodeTypesPretty.forEach(function(nt) {
+        if (availableNodeTypes[nt[0]]) {
+          $('#node-type-chooser').append(new Option(nt[1], nt[0]));
+        }
+      });
+      $('#node-type-chooser').prop('disabled', false);
 
       var taskNames = $.map(resp.compute_hosts, function(host, i) {
         return host.hypervisor_hostname;
       });
 
-      var format = '%d-%b %H:%M';
       $('#blazar-gantt').empty().height(20 * taskNames.length);
       gantt = d3.gantt({
         selector:'#blazar-gantt',
@@ -56,10 +84,8 @@
       form.removeClass('time-domain-processed');
       $('#dateStart').datepicker('setDate', timeDomain[0]);
       $('#timeStartHours').val(timeDomain[0].getHours());
-      $('#timeStartMinutes').val(timeDomain[0].getMinutes());
       $('#dateEnd').datepicker('setDate', timeDomain[1]);
       $('#timeEndHours').val(timeDomain[1].getHours());
-      $('#timeEndMinutes').val(timeDomain[1].getMinutes());
       form.addClass('time-domain-processed');
     }
 
@@ -70,9 +96,9 @@
       ];
 
       timeDomain[0].setHours($('#timeStartHours').val());
-      timeDomain[0].setMinutes($('#timeStartMinutes').val());
+      timeDomain[0].setMinutes(0);
       timeDomain[1].setHours($('#timeEndHours').val());
-      timeDomain[1].setMinutes($('#timeEndMinutes').val());
+      timeDomain[1].setMinutes(0);
 
       return timeDomain;
     }
@@ -89,6 +115,25 @@
 
     $('input[data-datepicker]', form).datepicker({
       dateFormat: 'mm/dd/yyyy'
+    });
+
+    $('#node-type-chooser').change(function() {
+      var timeDomain = getTimeDomain();
+      var nodeType = $('#node-type-chooser').val();
+
+      var filteredTaskNames = hosts
+        .filter(function (host) {return nodeType === '*' || nodeType === host.node_type})
+        .map(function (host) {return host.hypervisor_hostname});
+
+      $('#blazar-gantt').empty().height(20 * filteredTaskNames.length);
+      gantt = d3.gantt({
+        selector:'#blazar-gantt',
+        taskTypes: filteredTaskNames,
+        taskStatus: taskStatus,
+        tickFormat: format
+      });
+      gantt(tasks);
+      gantt.timeDomain(timeDomain);
     });
 
     $('input', form).on('change', function() {

@@ -54,7 +54,7 @@ class CalendarView(views.APIView):
 
 def calendar_data_view(request):
     data = {}
-    data['compute_hosts'] = api.blazar.compute_host_list(request)
+    data['compute_hosts'] = api.blazar.compute_host_list(request, node_types=True)
     data['reservations'] = api.blazar.reservation_calendar(request)
 
     return HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type="application/json")

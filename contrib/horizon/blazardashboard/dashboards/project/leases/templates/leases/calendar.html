@@ -7,22 +7,26 @@
 {% endblock page_header %}
 
 {% block main %}
-  <h4>Display Date Range</h4>
   <form class="form-inline" name="blazar-gantt-controls">
-    <div class="form-group">
+    <div class="form-group gantt-group">
       <label for="dateStart">Start</label>
       <input class="form-control" type="text" name="dateStart" id="dateStart" style="width:120px" placeholder="MM/DD/YYYY">
       <input class="form-control" type="number" min="00" max="23" name="timeStartHours" id="timeStartHours" style="width:55px" placeholder="hh">
       :
-      <input class="form-control" type="number" min="00" max="59" name="timeStartMinutes" id="timeStartMinutes" style="width:55px" placeholder="mm">
+      00
     </div>
-    &nbsp;
-    <div class="form-group">
+    <div class="form-group gantt-group">
       <label for="dateEnd">End</label>
       <input class="form-control" type="text" name="dateEnd" id="dateEnd" style="width:120px" placeholder="MM/DD/YYYY">
       <input class="form-control" type="number" min="00" max="23" name="timeEndHours" id="timeEndHours" style="width:55px" placeholder="hh">
       :
-      <input class="form-control" type="number" min="00" max="59" name="timeEndMinutes" id="timeEndMinutes" style="width:55px" placeholder="mm">
+      00
+    </div>
+    <div class="form-group gantt-group">
+      <label for="node-type-chooser">Node Type</label>
+      <select disabled class="form-control" id="node-type-chooser" name="node-type-chooser">
+        <option value="*">All nodes</option>
+      </select>
     </div>
   </form>
   <div id="blazar-gantt">

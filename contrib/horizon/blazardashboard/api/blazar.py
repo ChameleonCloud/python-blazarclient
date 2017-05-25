@@ -162,13 +162,41 @@ def node_in_lease(request, lease_id):
     hypervisor_hostnames = dictfetchall(cursor)
     return hypervisor_hostnames
 
-def compute_host_list(request):
+def compute_host_list(request, node_types=False):
     """Return a list of compute hosts available for reservation"""
     cursor = connections['blazar'].cursor()
     cursor.execute('SELECT hypervisor_hostname, vcpus, memory_mb, local_gb, cpu_info, hypervisor_type FROM computehosts WHERE deleted="0"')
     compute_hosts = dictfetchall(cursor)
 
+    if node_types:
+        node_types = node_type_map(cursor)
+        for ch in compute_hosts:
+            ch['node_type'] = node_types.get(ch['hypervisor_hostname'], 'unknown')
+
     return compute_hosts
+
+def node_type_map(cursor=None):
+    if cursor is None:
+        cursor = connections['blazar'].cursor()
+    sql = '''\
+    SELECT ch.hypervisor_hostname AS id, nt.node_type
+    FROM blazar.computehosts AS ch
+    INNER JOIN (
+        SELECT ex.computehost_id AS id, ex.capability_value AS node_type
+        FROM blazar.computehost_extra_capabilities AS ex
+        INNER JOIN (
+            SELECT id, MAX(created_at)
+            FROM blazar.computehost_extra_capabilities
+            WHERE capability_name = 'node_type' AND deleted = '0'
+            GROUP BY computehost_id
+        ) AS exl
+        ON ex.id = exl.id
+    ) AS nt
+    ON ch.id = nt.id;
+    '''
+    cursor.execute(sql)
+    node_types = dict(cursor.fetchall())
+    return node_types
 
 def reservation_calendar(request):
     """Return a list of all scheduled leases."""
