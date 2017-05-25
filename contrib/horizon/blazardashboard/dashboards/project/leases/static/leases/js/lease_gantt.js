@@ -153,6 +153,18 @@
         redraw();
       }
     });
+
+    $('.gantt-quickdays').click(function() {
+      var days = $(this).data("gantt-days");
+      var padFraction = 1/8; // gantt chart default is 3 hours for 1 day
+      var timeDomain = [
+        d3.time.day.offset(Date.now(), -days * padFraction),
+        d3.time.day.offset(Date.now(), days * (1 + padFraction))
+      ];
+      setTimeDomain(timeDomain);
+      gantt.timeDomain(timeDomain);
+      redraw();
+    });
   }
 
   horizon.addInitFunction(init);
