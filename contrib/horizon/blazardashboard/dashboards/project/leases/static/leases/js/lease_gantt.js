@@ -3,6 +3,7 @@
 
   function init() {
     var gantt;
+    var all_tasks;
     var tasks;
     var hosts;
     var form;
@@ -29,7 +30,7 @@
         ['arm64', 'ARM64'],
       ];
 
-      tasks = resp.reservations.map(function(reservation, i) {
+      all_tasks = resp.reservations.map(function(reservation, i) {
         reservation.hosts = resp.reservations.filter(
           function(r) {
             return r.id === this.id;
@@ -45,7 +46,7 @@
           'data': reservation
         }
       });
-
+      tasks = all_tasks;
       hosts = resp.compute_hosts;
 
       // populate node-type-chooser
@@ -66,7 +67,7 @@
 
       $('#blazar-gantt').empty().height(20 * taskNames.length);
       gantt = d3.gantt({
-        selector:'#blazar-gantt',
+        selector: '#blazar-gantt',
         taskTypes: taskNames,
         taskStatus: taskStatus,
         tickFormat: format
@@ -125,15 +126,20 @@
         .filter(function (host) {return nodeType === '*' || nodeType === host.node_type})
         .map(function (host) {return host.hypervisor_hostname});
 
+      tasks = all_tasks.filter(function(task) {
+        return filteredTaskNames.indexOf(task.taskName) >= 0
+      });
+
       $('#blazar-gantt').empty().height(20 * filteredTaskNames.length);
       gantt = d3.gantt({
-        selector:'#blazar-gantt',
+        selector: '#blazar-gantt',
         taskTypes: filteredTaskNames,
         taskStatus: taskStatus,
-        tickFormat: format
+        tickFormat: format,
+        timeDomainStart: timeDomain[0],
+        timeDomainEnd: timeDomain[1],
       });
       gantt(tasks);
-      gantt.timeDomain(timeDomain);
     });
 
     $('input', form).on('change', function() {
