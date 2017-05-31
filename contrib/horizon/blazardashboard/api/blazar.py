@@ -207,6 +207,7 @@ def reservation_calendar(request):
         l.project_id,
         l.start_date,
         l.end_date,
+        r.id,
         r.status,
         c.hypervisor_hostname
     FROM
