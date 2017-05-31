@@ -13,17 +13,35 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from collections import OrderedDict
 import logging
+
+from django.db import connections
+from django.utils.translation import ugettext_lazy as _
+import six
 
 from climateclient import client as blazar_client
 from climateclient import exception as blazar_exception
 
 from openstack_dashboard.api import base
 
-from django.db import connections
 
 LOG = logging.getLogger(__name__)
 LEASE_DATE_FORMAT = "%Y-%m-%d %H:%M"
+
+PRETTY_TYPE_NAMES = OrderedDict([
+    ('compute', _('Compute Node (default)')),
+    ('storage', _('Storage')),
+    ('gpu_k80', _('GPU (K80)')),
+    ('gpu_m40', _('GPU (M40)')),
+    ('gpu_p100', _('GPU (P100)')),
+    ('compute_ib', _('Infiniband Support')),
+    ('storage_hierarchy', _('Storage Hierarchy')),
+    ('fpga', _('FPGA')),
+    ('lowpower_xeon', _('Low power Xeon')),
+    ('atom', _('Atom')),
+    ('arm64', _('ARM64')),
+])
 
 
 class Lease(base.APIDictWrapper):
@@ -160,3 +178,28 @@ def reservation_calendar(request):
     host_reservations = dictfetchall(cursor)
 
     return host_reservations
+
+def available_nodetypes():
+    cursor = connections['blazar'].cursor()
+    sql = '''\
+    SELECT DISTINCT
+        capability_value
+    FROM
+        computehost_extra_capabilities
+    WHERE
+        capability_name = 'node_type'
+        AND deleted = '0'
+    GROUP BY
+        computehost_id
+    '''
+    cursor.execute(sql)
+    available = {row[0] for row in cursor.fetchall()}
+    choices = [(k, six.text_type(v)) for k, v in PRETTY_TYPE_NAMES.items() if k in available]
+
+    unprettyable = available - set(PRETTY_TYPE_NAMES)
+    if unprettyable:
+        unprettyable = sorted(unprettyable)
+        choices.extend((k, k) for k in unprettyable)
+        LOG.debug('New node types without pretty name(s): {}'.format(unprettyable))
+
+    return choices

@@ -104,22 +104,11 @@ class CreateForm(forms.SelfHandlingForm):
     )
     node_type = forms.ChoiceField(
         label=_('Node Type to Reserve'),
-        help_text=_('You can request to reserve nodes with Large Disk, GPU (K80 or M40), Storage '
-                    'Hierarchy, or Infiniband Support, or request standard compute '
-                    'nodes.'),
-        choices=(
-            ('compute', _('Compute Node (default)')),
-            ('storage', _('Storage')),
-            ('gpu_k80', _('GPU (K80)')),
-            ('gpu_m40', _('GPU (M40)')),
-            ('gpu_p100', _('GPU (P100)')),
-            ('compute_ib', _('Infiniband Support')),
-            ('storage_hierarchy', _('Storage Hierarchy')),
-            ('fpga', _('FPGA')),
-            ('lowpower_xeon', _('Low power Xeon')),
-            ('atom', _('Atom')),
-            ('arm64', _('ARM64')),
-        )
+        help_text=_('Choose standard compute nodes or nodes with heterogenous '
+                    'hardware such as more disk, GPUs, multiple storage devices, '
+                    'Infiniband, and more. Different hardware is available in '
+                    'different regions.'),
+        choices=api.blazar.available_nodetypes
     )
 
     def __init__(self, *args, **kwargs):
