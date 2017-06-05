@@ -104,10 +104,10 @@ class CreateForm(forms.SelfHandlingForm):
     )
     node_type = forms.ChoiceField(
         label=_('Node Type to Reserve'),
-        help_text=_('Choose standard compute nodes or nodes with heterogenous '
-                    'hardware such as more disk, GPUs, multiple storage devices, '
-                    'Infiniband, and more. Different hardware is available in '
-                    'different regions.'),
+        help_text=_('Choose standard compute nodes or heterogenous nodes with '
+                    'either more storage space, varied storage devices, GPUs, '
+                    'Infiniband, or other specialized hardware. Different '
+                    'hardware is available on different sites.'),
         choices=api.blazar.available_nodetypes
     )
 

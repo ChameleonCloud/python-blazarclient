@@ -189,8 +189,6 @@ def available_nodetypes():
     WHERE
         capability_name = 'node_type'
         AND deleted = '0'
-    GROUP BY
-        computehost_id
     '''
     cursor.execute(sql)
     available = {row[0] for row in cursor.fetchall()}
