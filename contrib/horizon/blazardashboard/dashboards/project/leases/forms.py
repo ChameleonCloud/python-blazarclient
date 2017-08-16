@@ -13,18 +13,18 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from datetime import datetime, timedelta
+import logging
 
 from django.utils.translation import ugettext_lazy as _
-from datetime import datetime, timedelta
-
 from horizon import exceptions
 from horizon import forms
 from horizon import messages
+import pytz
 
 from blazardashboard import api
 
-import pytz
-import logging
+from . import widgets
 
 logger = logging.getLogger('horizon')
 
@@ -283,13 +283,11 @@ class UpdateForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_('Stack Name'), widget=forms.TextInput())
     prolong_for = forms.CharField(
         label=_('Prolong for'),
-        widget=forms.TextInput(attrs={'placeholder':
-                                      _('Valid suffix are s/h/m/d')}),
+        widget=widgets.TimespanWidget(),
         required=False)
     reduce_by = forms.CharField(
         label=_('Reduce by'),
-        widget=forms.TextInput(attrs={'placeholder':
-                                      ('Valid suffix are s/h/m/d')}),
+        widget=widgets.TimespanWidget(),
         required=False)
 
     def __init__(self, *args, **kwargs):
