@@ -280,7 +280,7 @@ class UpdateForm(forms.SelfHandlingForm):
 
     lease_id = forms.CharField(
         label=_('Lease ID'), widget=forms.widgets.HiddenInput, required=True)
-    name = forms.CharField(label=_('Stack Name'), widget=forms.TextInput())
+    name = forms.CharField(label=_('Lease Name'), widget=forms.TextInput())
     prolong_for = forms.CharField(
         label=_('Prolong for'),
         widget=widgets.TimespanWidget(),
