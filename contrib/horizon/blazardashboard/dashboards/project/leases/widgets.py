@@ -47,7 +47,6 @@ class TimespanWidget(Widget):
         timespan = datetime.timedelta(**parts)
         total_seconds = timespan.total_seconds()
         if abs(total_seconds) < 1:
-            return '{:.0f}s'.format(total_seconds)
-        else:
-            # if zero time, drop
+            # if zero or sub-second time, ignore
             return ''
+        return '{:.0f}s'.format(total_seconds)
