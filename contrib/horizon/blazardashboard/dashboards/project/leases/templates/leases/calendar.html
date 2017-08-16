@@ -6,6 +6,10 @@
   {% include "horizon/common/_page_header.html" with title=_("Lease Calendar") %}
 {% endblock page_header %}
 
+{% block js %}
+  {% include "project/leases/_scripts.html" %}
+{% endblock %}
+
 {% block main %}
   <form class="form-inline" name="blazar-gantt-controls">
     <div class="form-group gantt-group">
