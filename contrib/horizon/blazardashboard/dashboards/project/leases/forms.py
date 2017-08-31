@@ -303,9 +303,26 @@ class UpdateForm(forms.SelfHandlingForm):
         lease_id = data.get('lease_id')
         fields = {
             'name': data.get('name'),
-            'prolong_for': data.get('prolong_for', None) or None,
-            'reduce_by': data.get('reduce_by', None) or None,
         }
+
+        # TODO(nicktimko): Create a better widget/use more appropriate
+        # controls because prolonging/reducing aren't really independent
+        # choices. Also expose other fields that lease.update supports.
+        # the TimespanWidget emits strings of the form "<int>s"
+        try:
+            prolong = float((data.get('prolong_for') or '0s').rstrip('s'))
+            reduce = float((data.get('reduce_by') or '0s').rstrip('s'))
+        except ValueError as e:
+            logger.error('Error updating lease: %s', e)
+            exceptions.handle(request, message="Invalid value provided.")
+            return
+
+        net_mins = round((prolong - reduce) / 60.0)
+        min_string = '{:.0f}m'.format(abs(net_mins))
+        if net_mins > 0:
+            fields['prolong_for'] = min_string
+        elif net_mins < 0:
+            fields['reduce_by'] = min_string
 
         try:
             api.blazar.lease_update(self.request, lease_id=lease_id, **fields)

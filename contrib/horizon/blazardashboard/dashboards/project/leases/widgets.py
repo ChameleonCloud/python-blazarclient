@@ -26,7 +26,7 @@ class TimespanWidget(Widget):
         return mark_safe(template)
 
     def value_from_datadict(self, data, files, name):
-        parts = {p: 0 for p in ['days', 'hours', 'minutes', 'seconds']}
+        parts = {p: 0 for p in ['days', 'hours', 'minutes']}
         for part in parts:
             try:
                 parts[part] = data['timespan-{}-{}'.format(name, part)]
