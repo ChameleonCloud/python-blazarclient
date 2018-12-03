@@ -35,6 +35,7 @@ from blazarclient import exception
 from blazarclient import utils
 from blazarclient.v1.shell_commands import hosts
 from blazarclient.v1.shell_commands import leases
+from blazarclient.v1.shell_commands import networks
 from blazarclient import version as base_version
 
 COMMANDS_V1 = {
@@ -47,7 +48,12 @@ COMMANDS_V1 = {
     'host-show': hosts.ShowHost,
     'host-create': hosts.CreateHost,
     'host-update': hosts.UpdateHost,
-    'host-delete': hosts.DeleteHost
+    'host-delete': hosts.DeleteHost,
+    'network-list': networks.ListNetworks,
+    'network-show': networks.ShowNetwork,
+    'network-create': networks.CreateNetwork,
+    'network-update': networks.UpdateNetwork,
+    'network-delete': networks.DeleteNetwork
 }
 
 VERSION = 1
