@@ -41,6 +41,12 @@ CREATE_RESERVATION_KEYS = {
         "on_start": None,
         "resource_type": 'physical:host'
     },
+    "virtual:floatingip": {
+        "network_id": "",
+        "amount": 1,
+        "required_floatingips": [],
+        "resource_type": 'virtual:floatingip'
+    },
     "virtual:instance": {
         "vcpus": "",
         "memory_mb": "",
@@ -287,10 +293,19 @@ class CreateLease(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['virtual:instance']
             elif "network" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['network']
+            elif "virtual:floatingip" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
             res_info = parse_params(res_str, defaults)
+
+            if 'virtual:floatingip' in res_str:
+                if not res_info.get('network_id'):
+                    err_msg = ("Missing reservation argument 'network_id' for "
+                               "virtual:floatingip reservation")
+                    raise exception.IncorrectLease(err_msg)
+
             reservations.append(res_info)
 
         if reservations:
