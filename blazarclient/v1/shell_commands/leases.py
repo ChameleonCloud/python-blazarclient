@@ -301,8 +301,6 @@ class CreateLease(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
             elif "network" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['network']
-            elif "virtual:floatingip" in res_str:
-                defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
