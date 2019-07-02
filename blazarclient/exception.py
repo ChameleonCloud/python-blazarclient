@@ -23,13 +23,8 @@ class BlazarClientException(Exception):
     code = 500
 
     def __init__(self, message=None, **kwargs):
-        self.kwargs = kwargs
-
-        if 'code' not in self.kwargs:
-            try:
-                self.kwargs['code'] = self.code
-            except AttributeError:
-                pass
+        if 'code' in kwargs:
+            self.code = kwargs.pop('code')
 
         if not message:
             message = self.message % kwargs
