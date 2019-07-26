@@ -28,7 +28,11 @@ from oslo_utils import encodeutils
 
 from blazarclient import client as blazar_client
 from blazarclient import exception
+<<<<<<< HEAD
 from blazarclient.v1.shell_commands import devices
+=======
+from blazarclient.v1.shell_commands import allocations
+>>>>>>> 30eab20 (Add Resource Allocations API support)
 from blazarclient.v1.shell_commands import floatingips
 from blazarclient.v1.shell_commands import hosts
 from blazarclient.v1.shell_commands import leases
@@ -61,9 +65,9 @@ COMMANDS_V1 = {
     'network-delete': networks.DeleteNetwork,
     'network-allocation-show': networks.ShowNetworkAllocation,
     'network-allocation-list': networks.ListNetworkAllocations,
-    'network-capability-list': networks.ListNetworkProperties,
-    'network-capability-show': networks.ShowNetworkProperty,
-    'network-capability-set': networks.UpdateNetworkProperty,
+    'network-property-list': networks.ListNetworkProperties,
+    'network-property-show': networks.ShowNetworkProperty,
+    'network-property-set': networks.UpdateNetworkProperty,
     'floatingip-list': floatingips.ListFloatingIPs,
     'floatingip-show': floatingips.ShowFloatingIP,
     'floatingip-create': floatingips.CreateFloatingIP,
@@ -77,9 +81,11 @@ COMMANDS_V1 = {
     'device-allocation-show': devices.ShowDeviceAllocation,
     'device-allocation-list': devices.ListDeviceAllocations,
     'device-reallocate': devices.ReallocateDevice,
-    'device-capability-list': devices.ListDeviceProperties,
-    'device-capability-show': devices.ShowDeviceProperty,
-    'device-capability-set': devices.UpdateDeviceProperty,
+    'device-property-list': devices.ListDeviceProperties,
+    'device-property-show': devices.ShowDeviceProperty,
+    'device-property-set': devices.UpdateDeviceProperty,
+    'allocation-list': allocations.ListAllocations,
+    'allocation-show': allocations.ShowAllocations,
 }
 
 VERSION = 1
