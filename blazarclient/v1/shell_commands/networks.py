@@ -38,6 +38,7 @@ class ListNetworks(command.ListCommand):
 class ShowNetwork(command.ShowCommand):
     """Show network details."""
     resource = 'network'
+    allow_names = False
     json_indent = 4
     log = logging.getLogger(__name__ + '.ShowNetwork')
 
@@ -116,6 +117,7 @@ class CreateNetwork(command.CreateCommand):
 class UpdateNetwork(command.UpdateCommand):
     """Update attributes of a network."""
     resource = 'network'
+    allow_names = False
     json_indent = 4
     log = logging.getLogger(__name__ + '.UpdateNetwork')
 
@@ -146,4 +148,5 @@ class UpdateNetwork(command.UpdateCommand):
 class DeleteNetwork(command.DeleteCommand):
     """Delete a network."""
     resource = 'network'
+    allow_names = False
     log = logging.getLogger(__name__ + '.DeleteNetwork')

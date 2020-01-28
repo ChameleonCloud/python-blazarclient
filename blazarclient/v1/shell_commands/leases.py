@@ -82,7 +82,6 @@ class ShowLease(command.ShowCommand):
     """Show details about the given lease."""
     resource = 'lease'
     json_indent = 4
-    name_key = 'name'
     log = logging.getLogger(__name__ + '.ShowLease')
 
 
@@ -350,7 +349,6 @@ class UpdateLease(command.UpdateCommand):
     """Update a lease."""
     resource = 'lease'
     json_indent = 4
-    name_key = 'name'
     log = logging.getLogger(__name__ + '.UpdateLease')
 
     def get_parser(self, prog_name):
@@ -469,5 +467,4 @@ class UpdateLease(command.UpdateCommand):
 class DeleteLease(command.DeleteCommand):
     """Delete a lease."""
     resource = 'lease'
-    name_key = 'name'
     log = logging.getLogger(__name__ + '.DeleteLease')
