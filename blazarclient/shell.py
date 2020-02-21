@@ -58,6 +58,8 @@ COMMANDS_V1 = {
     'network-create': networks.CreateNetwork,
     'network-update': networks.UpdateNetwork,
     'network-delete': networks.DeleteNetwork,
+    'network-allocation-show': networks.ShowNetworkAllocation,
+    'network-allocation-list': networks.ListNetworkAllocations,
     'floatingip-list': floatingips.ListFloatingIPs,
     'floatingip-show': floatingips.ShowFloatingIP,
     'floatingip-create': floatingips.CreateFloatingIP,
