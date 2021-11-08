@@ -20,6 +20,7 @@ from blazarclient.v1 import floatingips
 from blazarclient.v1 import hosts
 from blazarclient.v1 import leases
 from blazarclient.v1 import networks
+from blazarclient.v1 import resources
 
 
 class Client(object):
@@ -71,6 +72,12 @@ class Client(object):
                 version=self.version,
                 **kwargs)
         self.device = devices.DeviceClientManager(
+            blazar_url=self.blazar_url,
+            auth_token=self.auth_token,
+            session=self.session,
+            version=self.version,
+            **kwargs)
+        self.resource = resources.ResourceClientManager(
             blazar_url=self.blazar_url,
             auth_token=self.auth_token,
             session=self.session,

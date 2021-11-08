@@ -67,7 +67,10 @@ CREATE_RESERVATION_KEYS = {
         "resource_type": 'device'
     },
     "others": {
-        ".*": None
+        "min": "",
+        "max": "",
+        "resource_properties": {},
+        "resource_type": "",
     }
 }
 
@@ -280,6 +283,8 @@ class CreateLeaseBase(command.CreateCommand):
         prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
                           % "|".join(default.keys()))
 
+        self.log.info("%s", str_params)
+        self.log.info("%s", default)
         while str_params != "":
             match = prog.search(str_params)
 
