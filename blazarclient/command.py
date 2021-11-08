@@ -28,6 +28,8 @@ UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{4}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{12}'])
 
+import logging
+LOG = logging.getLogger(__name__)
 
 class OpenStackCommand(command.Command):
     """Base class for OpenStack commands."""
@@ -88,6 +90,26 @@ class BlazarCommand(OpenStackCommand):
         else:
             return self.app.client
 
+    def get_manager_and_args(
+        self, parsed_args, args, add_to_body=False, blazar_client=None
+    ):
+        if not blazar_client:
+            blazar_client = self.get_client()
+        if hasattr(parsed_args, "resource") and hasattr(blazar_client, parsed_args.resource):
+            resource_manager = getattr(blazar_client, parsed_args.resource)
+            if add_to_body:
+                args["resource_type"] = self.resource
+        elif hasattr(parsed_args, "resource"): # If third party resource
+            resource_manager = blazar_client.resource
+            if add_to_body:
+                args["resource_type"] = parsed_args.resource
+            else:
+                args.insert(0, parsed_args.resource)
+        else: # Else, no --resource, normal usage
+            resource_manager = getattr(blazar_client, self.resource)
+        return resource_manager, args
+
+
     def get_parser(self, prog_name):
         parser = super(BlazarCommand, self).get_parser(prog_name)
         return parser
@@ -135,7 +157,7 @@ class CreateCommand(BlazarCommand, show.ShowOne):
         self.log.debug('get_data(%s)' % parsed_args)
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
-        resource_manager = getattr(blazar_client, self.resource)
+        resource_manager, body = self.get_manager_and_args(parsed_args, body, add_to_body=True, blazar_client=blazar_client)
         data = resource_manager.create(**body)
         self.format_output_data(data)
 
@@ -178,8 +200,8 @@ class UpdateCommand(BlazarCommand):
                                                           self.id_pattern)
         else:
             res_id = parsed_args.id
-        resource_manager = getattr(blazar_client, self.resource)
-        resource_manager.update(res_id, **body)
+        resource_manager, args = self.get_manager_and_args(parsed_args, [res_id], add_to_body=False, blazar_client=blazar_client)
+        data = resource_manager.update(*args, **body)
         print('Updated %s: %s' % (self.resource, parsed_args.id),
               file=self.app.stdout)
         return
@@ -189,7 +211,7 @@ class DeleteCommand(BlazarCommand):
     """Delete a given resource."""
 
     api = 'reservation'
-    resource = None
+    resource = "resource"
     log = None
 
     def get_parser(self, prog_name):
@@ -206,16 +228,15 @@ class DeleteCommand(BlazarCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         blazar_client = self.get_client()
-        resource_manager = getattr(blazar_client, self.resource)
+        res_id = parsed_args.id
         if self.allow_names:
             res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
                                                           parsed_args.id,
                                                           self.name_key,
                                                           self.id_pattern)
-        else:
-            res_id = parsed_args.id
-        resource_manager.delete(res_id)
+        resource_manager, args = self.get_manager_and_args(parsed_args, [res_id], add_to_body=False, blazar_client=blazar_client)
+        data = resource_manager.delete(*args)
         print('Deleted %s: %s' % (self.resource, parsed_args.id),
               file=self.app.stdout)
         return
@@ -230,6 +251,8 @@ class ListCommand(BlazarCommand, lister.Lister):
     _formatters = {}
     list_columns = []
     unknown_parts_flag = True
+
+    list_fn_name = "list"
 
     def args2body(self, parsed_args):
         params = {}
@@ -249,8 +272,8 @@ class ListCommand(BlazarCommand, lister.Lister):
         """Retrieve a list of resources from Blazar server."""
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
-        resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.list(**body)
+        resource_manager, body = self.get_manager_and_args(parsed_args, body, add_to_body=True, blazar_client=blazar_client)
+        data = getattr(resource_manager, self.list_fn_name)(**body)
         return data
 
     def setup_columns(self, info, parsed_args):
@@ -292,7 +315,7 @@ class ListAllocationCommand(ListCommand, lister.Lister):
         """Retrieve a list of resources from Blazar server."""
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
-        resource_manager = getattr(blazar_client, self.resource)
+        resource_manager, body = self.get_manager_and_args(parsed_args, body, add_to_body=True, blazar_client=blazar_client)
         data = resource_manager.list_allocations(**body)
         return data
 
@@ -317,18 +340,15 @@ class ShowCommand(BlazarCommand, show.ShowOne):
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
         blazar_client = self.get_client()
-
+        res_id = parsed_args.id
         if self.allow_names:
             res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
                                                           parsed_args.id,
                                                           self.name_key,
                                                           self.id_pattern)
-        else:
-            res_id = parsed_args.id
-
-        resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.get(res_id)
+        resource_manager, args = self.get_manager_and_args(parsed_args, [res_id], add_to_body=False, blazar_client=blazar_client)
+        data = resource_manager.get(*args)
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
@@ -339,8 +359,8 @@ class ShowAllocationCommand(ShowCommand, show.ShowOne):
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
         blazar_client = self.get_client()
-        resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.get_allocation(parsed_args.id)
+        resource_manager, args = self.get_manager_and_args(parsed_args, [parsed_args.id], add_to_body=False, blazar_client=blazar_client)
+        data = resource_manager.get_allocation(*args)
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
@@ -377,8 +397,8 @@ class ReallocateCommand(BlazarCommand):
                                                           self.id_pattern)
         else:
             res_id = parsed_args.id
-        resource_manager = getattr(blazar_client, self.resource)
-        resource_manager.reallocate(res_id, body)
+        resource_manager, args = self.get_manager_and_args(parsed_args, [res_id, body], add_to_body=False, blazar_client=blazar_client)
+        resource_manager.reallocate(*args)
         print('Reallocated %s: %s' % (self.resource, parsed_args.id),
               file=self.app.stdout)
         return
@@ -400,8 +420,9 @@ class ShowCapabilityCommand(BlazarCommand, show.ShowOne):
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
         blazar_client = self.get_client()
-        resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.get_capability(parsed_args.capability_name)
+        resource_manager, args = self.get_manager_and_args(parsed_args, [parsed_args.capability_name], add_to_body=False, blazar_client=blazar_client)
+        LOG.info(args)
+        data = resource_manager.get_capability(*args)
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
@@ -415,7 +436,7 @@ class UpdateCapabilityCommand(BlazarCommand):
         self.log.debug('run(%s)' % parsed_args)
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
-        resource_manager = getattr(blazar_client, self.resource)
+        resource_manager, body = self.get_manager_and_args(parsed_args, body, add_to_body=True, blazar_client=blazar_client)
         resource_manager.set_capability(**body)
         print(
             'Updated %s extra capability: %s' % (
