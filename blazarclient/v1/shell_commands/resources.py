@@ -23,6 +23,21 @@ from blazarclient import exception
 RESOURCE_ID_PATTERN = '^[0-9]+$'
 
 
+class ListResourceTypes(command.ListCommand):
+    resource = "resource"
+    log = logging.getLogger(__name__ + '.ListResourceTypes')
+    list_columns = ['name', 'prefix']
+    list_fn_name = 'list_resources'
+
+    def get_parser(self, prog_name):
+        parser = super(ListResourceTypes, self).get_parser(prog_name)
+        parser.add_argument(
+            '--sort-by', metavar="<resource_column>",
+            help='column name used to sort result',
+            default='name'
+        )
+        return parser
+
 class ListResources(command.ListCommand):
     resource = "resource"
     log = logging.getLogger(__name__ + '.ListResources')
@@ -219,6 +234,7 @@ class ReallocateResource(command.ReallocateCommand):
     json_indent = 4
     log = logging.getLogger(__name__ + '.ReallocateResource')
     id_pattern = RESOURCE_ID_PATTERN
+    allow_names = False
 
     def get_parser(self, prog_name):
         parser = super(ReallocateResource, self).get_parser(prog_name)
