@@ -20,6 +20,12 @@ import logging
 LOG = logging.getLogger(__name__)
 
 class ResourceClientManager(base.BaseClientManager):
+    def list_resources(self, sort_by=None):
+        resp, body = self.request_manager.get('/resources')
+        if sort_by:
+            resources = sorted(body, key=lambda l: l[sort_by])
+        return body
+
     def create(self, resource_type, data, **kwargs):
         values = {'data': data}
         values.update(**kwargs)
