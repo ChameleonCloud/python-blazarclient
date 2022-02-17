@@ -435,3 +435,21 @@ class UpdateCapabilityCommand(BlazarCommand):
         return dict(
             capability_name=parsed_args.capability_name,
             private=(parsed_args.private is True))
+
+
+class DeleteReservationCommand(DeleteCommand):
+    """Delete a given reservation."""
+
+    api = 'reservation'
+    resource = None
+    log = None
+
+    def run(self, parsed_args):
+        self.log.debug('run(%s)' % parsed_args)
+        blazar_client = self.get_client()
+        resource_manager = getattr(blazar_client, self.resource)
+        res_id = parsed_args.id
+        resource_manager.delete_reservation(res_id)
+        print('Deleted %s reservation: %s' % (self.resource, parsed_args.id),
+              file=self.app.stdout)
+        return

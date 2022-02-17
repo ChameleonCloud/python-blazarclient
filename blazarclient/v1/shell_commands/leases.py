@@ -510,3 +510,10 @@ class DeleteLease(command.DeleteCommand):
     resource = 'lease'
     name_key = 'name'
     log = logging.getLogger(__name__ + '.DeleteLease')
+
+
+class DeleteLeaseReservation(command.DeleteReservationCommand):
+    """Delete a reservation."""
+    resource = 'lease'
+    name_key = 'id'
+    log = logging.getLogger(__name__ + '.DeleteLease')

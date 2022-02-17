@@ -86,6 +86,11 @@ class LeaseClientManager(base.BaseClientManager):
         """Deletes lease with specified ID."""
         resp, body = self.request_manager.delete('/leases/%s' % lease_id)
 
+    def delete_reservation(self, res_id):
+        """Deletes reservation with specified ID."""
+        resp, body = self.request_manager.delete(
+            '/leases/reservation/%s' % res_id)
+
     def list(self, sort_by=None):
         """List all leases."""
         resp, body = self.request_manager.get('/leases')
