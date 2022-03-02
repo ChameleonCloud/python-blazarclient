@@ -16,6 +16,8 @@
 """
 Command-line interface to the Blazar APIs
 """
+
+from __future__ import print_function
 import argparse
 import logging
 import os
@@ -23,11 +25,15 @@ import sys
 
 from cliff import app
 from cliff import commandmanager
+from keystoneauth1 import identity
 from keystoneauth1 import loading
+from keystoneauth1 import session
 from oslo_utils import encodeutils
+import six
 
 from blazarclient import client as blazar_client
 from blazarclient import exception
+from blazarclient import utils
 from blazarclient.v1.shell_commands import devices
 from blazarclient.v1.shell_commands import floatingips
 from blazarclient.v1.shell_commands import hosts
@@ -213,12 +219,12 @@ class BlazarShell(app.App):
         parser.add_argument(
             '--service-type', metavar='<service-type>',
             default=env('BLAZAR_SERVICE_TYPE'),
-            help=('(deprecated) Use --os-service-type instead. '
+            help=('(deprecated) use --os-service-type instead. '
                   'Defaults to env[BLAZAR_SERVICE_TYPE].'))
         parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
             default=env('OS_ENDPOINT_TYPE'),
-            help=('(deprecated) Use --os-interface instead. '
+            help=('(deprecated) use --os-interface intstead. '
                   'Defaults to env[OS_ENDPOINT_TYPE].'))
 
         return parser
@@ -293,10 +299,10 @@ class BlazarShell(app.App):
 
         except Exception as err:
             if self.options.debug:
-                self.log.exception(str(err))
+                self.log.exception(six.text_type(err))
                 raise
             else:
-                self.log.error(str(err))
+                self.log.error(six.text_type(err))
             return 1
         if self.interactive_mode:
             _argv = [sys.argv[0]]
@@ -319,17 +325,17 @@ class BlazarShell(app.App):
             return run_command(cmd, cmd_parser, sub_argv)
         except Exception as err:
             if self.options.debug:
-                self.log.exception(str(err))
+                self.log.exception(six.text_type(err))
             else:
-                self.log.error(str(err))
+                self.log.error(six.text_type(err))
             try:
                 self.clean_up(cmd, result, err)
             except Exception as err2:
                 if self.options.debug:
-                    self.log.exception(str(err2))
+                    self.log.exception(six.text_type(err2))
                 else:
                     self.log.error('Could not clean up: %s',
-                                   str(err2))
+                                   six.text_type(err2))
             if self.options.debug:
                 raise
             else:
@@ -337,10 +343,10 @@ class BlazarShell(app.App):
                     self.clean_up(cmd, result, None)
                 except Exception as err3:
                     if self.options.debug:
-                        self.log.exception(str(err3))
+                        self.log.exception(six.text_type(err3))
                     else:
                         self.log.error('Could not clean up: %s',
-                                       str(err3))
+                                       six.text_type(err3))
         return result
 
     def authenticate_user(self):
@@ -351,8 +357,7 @@ class BlazarShell(app.App):
         self.client = blazar_client.Client(
             self.options.os_reservation_api_version,
             session=sess,
-            service_type=(self.options.service_type or
-                          self.options.os_service_type),
+            service_type=self.options.service_type or self.options.os_service_type,
             interface=self.options.endpoint_type or self.options.os_interface,
             region_name=self.options.os_region_name,
         )
@@ -377,7 +382,7 @@ class BlazarShell(app.App):
     def clean_up(self, cmd, result, err):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
-            self.log.debug('got an error: %s', str(err))
+            self.log.debug('got an error: %s', six.text_type(err))
 
     def configure_logging(self):
         """Create logging handlers for any log output."""
@@ -411,7 +416,7 @@ def main(argv=sys.argv[1:]):
     except exception.BlazarClientException:
         return 1
     except Exception as e:
-        print(str(e))
+        print(six.text_type(e))
         return 1
 
 

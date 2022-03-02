@@ -32,14 +32,12 @@ class BaseClientTestCase(tests.TestCase):
     def test_with_v1(self):
         self.client.Client()
         self.import_obj.assert_called_once_with(
-            'blazarclient.v1.client.Client',
-            service_type='reservation')
+            'blazarclient.v1.client.Client')
 
     def test_with_v1a0(self):
         self.client.Client(version='1a0')
         self.import_obj.assert_called_once_with(
-            'blazarclient.v1.client.Client',
-            service_type='reservation')
+            'blazarclient.v1.client.Client')
 
     def test_with_wrong_vers(self):
         self.assertRaises(exception.UnsupportedVersion,
