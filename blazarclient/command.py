@@ -252,11 +252,17 @@ class ListCommand(BlazarCommand, lister.Lister):
         return data
 
     def setup_columns(self, info, parsed_args):
+        """
+        Determines the list of columns that may be visible to the client. This may not
+        be the columns that are actually visible to the client on the output of their
+        command. The output columns are determined by a process in cliff.display which
+        compares the parsed_args to the list output by this function.
+        """
         columns = len(info) > 0 and sorted(info[0].keys()) or []
         if not columns:
             parsed_args.columns = []
         elif parsed_args.columns:
-            columns = [col for col in parsed_args.columns if col in columns]
+            columns = [col for col in parsed_args.columns if col in columns] + columns
         elif self.list_columns:
             columns = [col for col in self.list_columns if col in columns]
         return (
