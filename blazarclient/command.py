@@ -262,7 +262,10 @@ class ListCommand(BlazarCommand, lister.Lister):
         if not columns:
             parsed_args.columns = []
         elif parsed_args.columns:
-            columns = [col for col in parsed_args.columns if col in columns] + columns
+            valid_parsed_columns = {
+                col for col in parsed_args.columns if col in columns
+            }
+            columns = list(valid_parsed_columns | set(columns))
         elif self.list_columns:
             columns = [col for col in self.list_columns if col in columns]
         return (
