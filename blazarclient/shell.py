@@ -78,6 +78,7 @@ COMMANDS_V1 = {
     'device-show': devices.ShowDevice,
     'device-create': devices.CreateDevice,
     'device-update': devices.UpdateDevice,
+    'device-unset': devices.UnsetAttributeDevice,
     'device-delete': devices.DeleteDevice,
     'device-allocation-show': devices.ShowDeviceAllocation,
     'device-allocation-list': devices.ListDeviceAllocations,
