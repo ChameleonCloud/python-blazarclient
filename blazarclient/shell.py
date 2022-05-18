@@ -63,6 +63,7 @@ COMMANDS_V1 = {
     'network-show': networks.ShowNetwork,
     'network-create': networks.CreateNetwork,
     'network-update': networks.UpdateNetwork,
+    'network-unset': networks.UnsetAttributeNetwork,
     'network-delete': networks.DeleteNetwork,
     'network-allocation-show': networks.ShowNetworkAllocation,
     'network-allocation-list': networks.ListNetworkAllocations,
