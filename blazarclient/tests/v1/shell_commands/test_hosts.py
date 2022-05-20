@@ -148,7 +148,7 @@ class UnsetAttributesHostTest(tests.TestCase):
             extra_capabilities=extra_caps
         )
         expected = {
-            'values': {key: 'null' for key in extra_caps}
+            'values': {key: None for key in extra_caps}
         }
         unset_host.run(args)
         host_manager.update.assert_called_once_with('101', **expected)

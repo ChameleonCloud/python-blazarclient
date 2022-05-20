@@ -149,7 +149,7 @@ class UnsetAttributeDevice(UpdateDevice):
         if parsed_args.extra_capabilities:
             return {
                 'values': {
-                    cap: 'null' for cap in parsed_args.extra_capabilities
+                    cap: None for cap in parsed_args.extra_capabilities
                 }
             }
         else:

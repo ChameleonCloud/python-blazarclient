@@ -112,7 +112,7 @@ class UnsetAttributesNetworkTest(tests.TestCase):
             extra_capabilities=extra_caps,
         )
         expected = {
-            'values': {key: 'null' for key in extra_caps}
+            'values': {key: None for key in extra_caps}
        }
         unset_network.run(args)
         network_manager.assert_called_once_with('101', **expected)
