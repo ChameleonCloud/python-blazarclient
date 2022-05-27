@@ -142,23 +142,6 @@ class CreateLeaseBase(command.CreateCommand):
             default=None
         )
         parser.add_argument(
-            '--physical-reservation',
-            metavar="<min=int,max=int,hypervisor_properties=str,"
-                    "resource_properties=str,before_end=str,on_start=str>",
-            action='append',
-            dest='physical_reservations',
-            help='Create a reservation for physical compute hosts. '
-                 'Specify option multiple times to create multiple '
-                 'reservations. '
-                 'min: minimum number of hosts to reserve. '
-                 'max: maximum number of hosts to reserve. '
-                 'hypervisor_properties: JSON string, see doc. '
-                 'resource_properties: JSON string, see doc. '
-                 'before_end: JSON string, see doc. '
-                 'on_start: JSON string, see doc. ',
-            default=[]
-        )
-        parser.add_argument(
             '--reservation',
             metavar="<key=value>",
             action='append',
