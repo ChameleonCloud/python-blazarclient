@@ -71,7 +71,8 @@ class ListFloatingIPsTest(tests.TestCase):
                              ('f180cf4c-f886-4dd1-8c36-854d17fbefb5',)]]
 
         ret = list_floatingips.get_data(args)
-        self.assertEqual(expected[0], ret[0])
+        # ret is a set
+        self.assertEqual(expected[0], list(ret[0]))
         self.assertEqual(expected[1], [x for x in ret[1]])
 
         floatingip_manager.list.assert_called_once_with(sort_by='id')

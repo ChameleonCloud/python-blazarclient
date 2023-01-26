@@ -328,6 +328,10 @@ class ShowLeaseTestCase(tests.TestCase):
     def test_show_lease(self):
         show_lease, lease_manager = self.create_show_command()
         lease_manager.get.return_value = {'id': FIRST_LEASE}
+        lease_manager.list.return_value = [
+            {'id': FIRST_LEASE, 'name': 'first-lease'},
+            {'id': SECOND_LEASE, 'name': 'second-lease'},
+        ]
         mock.seal(lease_manager)
 
         args = argparse.Namespace(id=FIRST_LEASE)
@@ -368,6 +372,7 @@ class DeleteLeaseTestCase(tests.TestCase):
     def test_delete_lease(self):
         delete_lease, lease_manager = self.create_delete_command()
         lease_manager.delete.return_value = None
+        lease_manager.list.return_value = [{'id': FIRST_LEASE}]
         mock.seal(lease_manager)
 
         args = argparse.Namespace(id=FIRST_LEASE)
