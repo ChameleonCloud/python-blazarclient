@@ -265,10 +265,11 @@ class ListNetworksTest(tests.TestCase):
             sort_by="segment_id", columns=[]
         )
         return_networks = list_network.get_data(list_networks_args)
+        print(list(return_networks[1]))
+        print(list(return_networks[0]).index("segment_id"))
         segment_id_index = list(return_networks[0]).index("segment_id")
         prev_segment_id = 0
         for network in list(return_networks[1]):
             network_segment_id = network[segment_id_index]
             self.assertLess(prev_segment_id, network_segment_id)
             prev_segment_id = network_segment_id
-        # network_manager.list.assert_called_once_with(sort_by='segment_id')
