@@ -30,7 +30,7 @@ class ListNetworks(command.ListCommand):
         parser.add_argument(
             '--sort-by', metavar="<network_column>",
             help='column name used to sort result',
-            default='id'
+            default='segment_id'
         )
         return parser
 
@@ -219,7 +219,6 @@ class ListNetworkCapabilities(command.ListCommand):
             else:
                 msg = 'Invalid sort option %s' % parsed_args.sort_by
                 raise exception.BlazarClientException(msg)
-
         return params
 
     def retrieve_list(self, parsed_args):
