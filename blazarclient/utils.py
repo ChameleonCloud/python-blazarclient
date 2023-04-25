@@ -93,7 +93,8 @@ def get_item_properties(item, fields, mixed_case_fields=None, formatters=None):
             else:
                 field_name = field.lower().replace(' ', '_')
             if not hasattr(item, field_name) and isinstance(item, dict):
-                data = item[field_name]
+                # display null if the resource does not have a field
+                data = item.get(field_name, "null")
             else:
                 data = getattr(item, field_name, '')
             if data is None:

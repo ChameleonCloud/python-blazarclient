@@ -260,7 +260,11 @@ class ListCommand(BlazarCommand, lister.Lister):
         command. The output columns are determined by a process in cliff.display which
         compares the parsed_args to the list output by this function.
         """
-        columns = len(info) > 0 and sorted(info[0].keys()) or []
+        # return empty list when info is empty
+        # or sort all keys that are in all the networks
+        columns = (
+            len(info) > 0 and sorted({k for d in info for k in d.keys()}) or []
+        )
         if parsed_args.columns:
             valid_parsed_columns = {col for col in parsed_args.columns if col in columns}
         else:
