@@ -103,20 +103,20 @@ class UnsetAttributesNetworkTest(tests.TestCase):
 
     def test_unset_network(self):
         list_value = [
-            {'id': '101', 'networkname': 'network-1'},
-            {'id': '201', 'networkname': 'network-2'},
+            {'id': '072c58c0-64ac-467b-b040-9138771e146a', 'networkname': 'network-1'},
+            {'id': '072c58c0-64ac-467b-b040-9138771e146b', 'networkname': 'network-2'},
         ]
         unset_network, network_manager = self.create_unset_command(list_value)
         extra_caps = ['key1', 'key2']
         args = argparse.Namespace(
-            id='101',
+            id='072c58c0-64ac-467b-b040-9138771e146a',
             extra_capabilities=extra_caps,
         )
         expected = {
             'values': {key: None for key in extra_caps}
        }
         unset_network.run(args)
-        network_manager.assert_called_once_with('101', **expected)
+        network_manager.update.assert_called_once_with('072c58c0-64ac-467b-b040-9138771e146a', **expected)
 
 class ShowNetworkTest(tests.TestCase):
 
@@ -231,11 +231,11 @@ class ListNetworksTest(tests.TestCase):
 
         list_network, network_manager = self.create_list_command()
         list_networks_args = argparse.Namespace(
-            columns=['segment_id', 'id']
+            sort_by='segment_id',
+            columns=[]
         )
         return_networks = list_network.get_data(list_networks_args)
         segment_id_index = list(return_networks[0]).index('segment_id')
-        print(segment_id_index)
         prev_segment_id = 0
         for network in list(return_networks[1]):
             network_segment_id = network[segment_id_index]
