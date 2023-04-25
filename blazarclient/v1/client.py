@@ -35,44 +35,54 @@ class Client(object):
         ...
     """
 
-    version = '1'
+    version = "1"
 
-    def __init__(self, blazar_url=None, auth_token=None, session=None,
-                 **kwargs):
+    def __init__(
+        self, blazar_url=None, auth_token=None, session=None, **kwargs
+    ):
         self.blazar_url = blazar_url
         self.auth_token = auth_token
         self.session = session
 
         if not self.session:
-            logging.warning('Use a keystoneauth session object for the '
-                            'authentication. The authentication with '
-                            'blazar_url and auth_token is deprecated.')
+            logging.warning(
+                "Use a keystoneauth session object for the "
+                "authentication. The authentication with "
+                "blazar_url and auth_token is deprecated."
+            )
 
-        self.lease = leases.LeaseClientManager(blazar_url=self.blazar_url,
-                                               auth_token=self.auth_token,
-                                               session=self.session,
-                                               version=self.version,
-                                               **kwargs)
-        self.host = hosts.ComputeHostClientManager(blazar_url=self.blazar_url,
-                                                   auth_token=self.auth_token,
-                                                   session=self.session,
-                                                   version=self.version,
-                                                   **kwargs)
+        self.lease = leases.LeaseClientManager(
+            blazar_url=self.blazar_url,
+            auth_token=self.auth_token,
+            session=self.session,
+            version=self.version,
+            **kwargs
+        )
+        self.host = hosts.ComputeHostClientManager(
+            blazar_url=self.blazar_url,
+            auth_token=self.auth_token,
+            session=self.session,
+            version=self.version,
+            **kwargs
+        )
         self.floatingip = floatingips.FloatingIPClientManager(
             blazar_url=self.blazar_url,
             auth_token=self.auth_token,
             session=self.session,
             version=self.version,
-            **kwargs)
+            **kwargs
+        )
         self.network = networks.NetworkClientManager(
-                blazar_url=self.blazar_url,
-                auth_token=self.auth_token,
-                session=self.session,
-                version=self.version,
-                **kwargs)
+            blazar_url=self.blazar_url,
+            auth_token=self.auth_token,
+            session=self.session,
+            version=self.version,
+            **kwargs
+        )
         self.device = devices.DeviceClientManager(
             blazar_url=self.blazar_url,
             auth_token=self.auth_token,
             session=self.session,
             version=self.version,
-            **kwargs)
+            **kwargs
+        )
