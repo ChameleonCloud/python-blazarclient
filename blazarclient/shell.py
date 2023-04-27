@@ -354,7 +354,8 @@ class BlazarShell(app.App):
         self.client = blazar_client.Client(
             self.options.os_reservation_api_version,
             session=sess,
-            service_type=self.options.service_type or self.options.os_service_type,
+            service_type=(self.options.service_type or
+                          self.options.os_service_type),
             interface=self.options.endpoint_type or self.options.os_interface,
             region_name=self.options.os_region_name,
         )

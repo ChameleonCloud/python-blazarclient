@@ -19,7 +19,10 @@ from blazarclient import command
 from blazarclient import exception
 
 # Matches integers or UUIDs
-HOST_ID_PATTERN = r'^([0-9]+|([0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}))$'
+HOST_ID_PATTERN = (
+    r"^([0-9]+|([0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]"
+    r"{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}))$"
+)
 
 
 class ListHosts(command.ListCommand):
@@ -140,6 +143,7 @@ class UnsetAttributesHost(UpdateHost):
             }
         else:
             return {}
+
 
 class DeleteHost(command.DeleteCommand):
     """Delete a host."""

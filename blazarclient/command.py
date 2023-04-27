@@ -254,11 +254,11 @@ class ListCommand(BlazarCommand, lister.Lister):
         return data
 
     def setup_columns(self, info, parsed_args):
-        """
-        Determines the list of columns that may be visible to the client. This may not
-        be the columns that are actually visible to the client on the output of their
-        command. The output columns are determined by a process in cliff.display which
-        compares the parsed_args to the list output by this function.
+        """Determines the list of columns that may be visible to the client.
+        This may not be the columns that are actually visible to the client
+        on the output of their command. The output columns are determined
+        by a process in cliff.display which compares the parsed_args to the
+        list output by this function.
         """
         # return empty list when info is empty
         # or sort all keys that are in all the networks
@@ -266,13 +266,15 @@ class ListCommand(BlazarCommand, lister.Lister):
             len(info) > 0 and sorted({k for d in info for k in d.keys()}) or []
         )
         if parsed_args.columns:
-            valid_parsed_columns = {col for col in parsed_args.columns if col in columns}
+            valid_parsed_columns = {
+                col for col in parsed_args.columns if col in columns
+            }
         else:
             valid_parsed_columns = set()
         if self.list_columns:
             columns = {
-                          col for col in self.list_columns if col in columns
-                      } | valid_parsed_columns
+                col for col in self.list_columns if col in columns
+            } | valid_parsed_columns
         return (
             columns,
             (utils.get_item_properties(s, columns, formatters=self._formatters)
