@@ -53,8 +53,8 @@ class CreateNetwork(command.CreateCommand):
         parser.add_argument(
             '--network-type',
             help='Type of physical mechanism associated with the network '
-                  'segment. For example: flat, geneve, gre, local, vlan, '
-                  'vxlan.'
+            'segment. For example: flat, geneve, gre, local, vlan, '
+            'vxlan.'
         )
         parser.add_argument(
             '--physical-network',
@@ -142,6 +142,7 @@ class UpdateNetwork(command.UpdateCommand):
             params['values'] = extras
         return params
 
+
 class UnsetAttributeNetwork(UpdateNetwork):
     log = logging.getLogger(__name__ + '.UnsetAttributeNetwork')
 
@@ -152,7 +153,8 @@ class UnsetAttributeNetwork(UpdateNetwork):
             action='append',
             dest='extra_capabilities',
             default=[],
-            help='Extra capability keys which should be unset from the network.'
+            help='Extra capability keys which should be unset'
+            'from the network.'
         )
         return parser
 
