@@ -120,8 +120,12 @@ def find_resource_id_by_name_or_id(client, resource_type, name_or_id,
 
 
 def _find_resource_id_by_name(client, resource_type, name, name_key):
-    resource_manager = getattr(client, resource_type)
-    resources = resource_manager.list()
+    if hasattr(client, resource_type):
+        resource_manager = getattr(client, resource_type)
+        resources = resource_manager.list()
+    else: # If third party resource
+        resource_manager = client.resource
+        resources = resource_manager.list(resource_type)
 
     named_resources = []
     key = name_key if name_key else 'name'
