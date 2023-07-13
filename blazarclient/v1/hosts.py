@@ -43,7 +43,7 @@ class ComputeHostClientManager(base.BaseClientManager):
 
     def delete(self, host_id):
         """Delete host with specified ID."""
-        resp, body = self.request_manager.delete('/os-hosts/%s' % host_id)
+        self.request_manager.delete('/os-hosts/%s' % host_id)
 
     def list(self, sort_by=None):
         """List all hosts."""

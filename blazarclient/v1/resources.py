@@ -23,7 +23,7 @@ class ResourceClientManager(base.BaseClientManager):
     def list_resources(self, sort_by=None):
         resp, body = self.request_manager.get('/resources')
         if sort_by:
-            resources = sorted(body, key=lambda l: l[sort_by])
+            body = sorted(body, key=lambda l: l[sort_by])
         return body
 
     def create(self, resource_type, data, **kwargs):
@@ -38,11 +38,8 @@ class ResourceClientManager(base.BaseClientManager):
         return body['resource']
 
     def update(self, resource_type, res_id, data, extras):
-        LOG.info("RESOURCE CLIENT UPDATE")
         if not data and not extras:
             return _('No information to update passed.')
-        LOG.info(data)
-        LOG.info(extras)
         body = {"data": data, "extras": extras}
         resp, body = self.request_manager.put(
             f'/{resource_type}/{res_id}', body=body

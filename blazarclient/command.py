@@ -95,18 +95,18 @@ class BlazarCommand(OpenStackCommand):
     ):
         if not blazar_client:
             blazar_client = self.get_client()
-        if hasattr(parsed_args, "resource") and hasattr(blazar_client, parsed_args.resource):
-            resource_manager = getattr(blazar_client, parsed_args.resource)
-            if add_to_body:
-                args["resource_type"] = self.resource
-        elif hasattr(parsed_args, "resource"): # If third party resource
-            resource_manager = blazar_client.resource
-            if add_to_body:
-                args["resource_type"] = parsed_args.resource
-            else:
-                args.insert(0, parsed_args.resource)
+        if hasattr(parsed_args, "resource"): # Passed in via --resource flag
+            if hasattr(blazar_client, parsed_args.resource): # Not built-in type
+                resource_manager = getattr(blazar_client, parsed_args.resource)
+            else: # A built-in resource type
+                resource_manager = blazar_client.resource
         else: # Else, no --resource, normal usage
             resource_manager = getattr(blazar_client, self.resource)
+        # Update resource type depending on calling method
+        if add_to_body:
+            args["resource_type"] = parsed_args.resource
+        else:
+            args.insert(0, parsed_args.resource)
         return resource_manager, args
 
 
@@ -201,7 +201,7 @@ class UpdateCommand(BlazarCommand):
         else:
             res_id = parsed_args.id
         resource_manager, args = self.get_manager_and_args(parsed_args, [res_id], add_to_body=False, blazar_client=blazar_client)
-        data = resource_manager.update(*args, **body)
+        resource_manager.update(*args, **body)
         print('Updated %s: %s' % (self.resource, parsed_args.id),
               file=self.app.stdout)
         return
@@ -228,15 +228,16 @@ class DeleteCommand(BlazarCommand):
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
         blazar_client = self.get_client()
-        res_id = parsed_args.id
         if self.allow_names:
             res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
                                                           parsed_args.id,
                                                           self.name_key,
                                                           self.id_pattern)
+        else:
+            res_id = parsed_args.id
         resource_manager, args = self.get_manager_and_args(parsed_args, [res_id], add_to_body=False, blazar_client=blazar_client)
-        data = resource_manager.delete(*args)
+        resource_manager.delete(*args)
         print('Deleted %s: %s' % (self.resource, parsed_args.id),
               file=self.app.stdout)
         return
