@@ -95,18 +95,21 @@ class BlazarCommand(OpenStackCommand):
     ):
         if not blazar_client:
             blazar_client = self.get_client()
+
         if hasattr(parsed_args, "resource"): # Passed in via --resource flag
             if hasattr(blazar_client, parsed_args.resource): # Not built-in type
                 resource_manager = getattr(blazar_client, parsed_args.resource)
+                if add_to_body:
+                    args["resource_type"] = parsed_args.resource
+                else:
+                    args.insert(0, parsed_args.resource)
             else: # A built-in resource type
                 resource_manager = blazar_client.resource
+                if add_to_body:
+                    args["resource_type"] = self.resource
         else: # Else, no --resource, normal usage
             resource_manager = getattr(blazar_client, self.resource)
         # Update resource type depending on calling method
-        if add_to_body:
-            args["resource_type"] = parsed_args.resource
-        else:
-            args.insert(0, parsed_args.resource)
         return resource_manager, args
 
 
