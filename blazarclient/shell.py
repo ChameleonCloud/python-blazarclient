@@ -61,9 +61,9 @@ COMMANDS_V1 = {
     'network-delete': networks.DeleteNetwork,
     'network-allocation-show': networks.ShowNetworkAllocation,
     'network-allocation-list': networks.ListNetworkAllocations,
-    'network-capability-list': networks.ListNetworkCapabilities,
-    'network-capability-show': networks.ShowNetworkCapability,
-    'network-capability-set': networks.UpdateNetworkCapability,
+    'network-capability-list': networks.ListNetworkProperties,
+    'network-capability-show': networks.ShowNetworkProperty,
+    'network-capability-set': networks.UpdateNetworkProperty,
     'floatingip-list': floatingips.ListFloatingIPs,
     'floatingip-show': floatingips.ShowFloatingIP,
     'floatingip-create': floatingips.CreateFloatingIP,
@@ -77,9 +77,9 @@ COMMANDS_V1 = {
     'device-allocation-show': devices.ShowDeviceAllocation,
     'device-allocation-list': devices.ListDeviceAllocations,
     'device-reallocate': devices.ReallocateDevice,
-    'device-capability-list': devices.ListDeviceCapabilities,
-    'device-capability-show': devices.ShowDeviceCapability,
-    'device-capability-set': devices.UpdateDeviceCapability,
+    'device-capability-list': devices.ListDeviceProperties,
+    'device-capability-show': devices.ShowDeviceProperty,
+    'device-capability-set': devices.UpdateDeviceProperty,
 }
 
 VERSION = 1
