@@ -202,21 +202,24 @@ class ReallocateHost(command.ReallocateCommand):
         return params
 
 
-class ShowHostCapability(command.ShowCapabilityCommand):
-    """Show host capability."""
+class ShowHostProperty(command.ShowPropertyCommand):
+    """Show host property."""
     resource = 'host'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.ShowHostCapability')
+    log = logging.getLogger(__name__ + '.ShowHostProperty')
 
 
-class ListHostCapabilities(command.ListCommand):
-    """List host capabilities."""
+class ListHostProperties(command.ListCommand):
+    """List host properties."""
     resource = 'host'
-    log = logging.getLogger(__name__ + '.ListHostCapabilities')
-    list_columns = ['property', 'private', 'capability_values']
+    log = logging.getLogger(__name__ + '.ListHostProperties')
+    list_columns = ['property', 'private', 'property_values']
 
     def args2body(self, parsed_args):
-        params = {'detail': parsed_args.detail}
+        params = {
+            'detail': parsed_args.detail,
+            'all': parsed_args.all,
+        }
         if parsed_args.sort_by:
             if parsed_args.sort_by in self.list_columns:
                 params['sort_by'] = parsed_args.sort_by
@@ -231,28 +234,34 @@ class ListHostCapabilities(command.ListCommand):
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.list_capabilities(**body)
+        data = resource_manager.list_properties(**body)
         return data
 
     def get_parser(self, prog_name):
-        parser = super(ListHostCapabilities, self).get_parser(prog_name)
+        parser = super(ListHostProperties, self).get_parser(prog_name)
         parser.add_argument(
             '--detail',
             action='store_true',
-            help='Return capabilities with values and attributes.',
+            help='Return properties with values and attributes.',
             default=False
         )
         parser.add_argument(
-            '--sort-by', metavar="<extra_capability_column>",
+            '--sort-by', metavar="<property_column>",
             help='column name used to sort result',
             default='property'
+        )
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            help='Return all properties, public and private.',
+            default=False
         )
         return parser
 
 
-class UpdateHostCapability(command.UpdateCapabilityCommand):
-    """Update attributes of a host capability."""
+class UpdateHostProperty(command.UpdatePropertyCommand):
+    """Update attributes of a host property."""
     resource = 'host'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.UpdateHostCapability')
-    name_key = 'capability_name'
+    log = logging.getLogger(__name__ + '.UpdateHostProperty')
+    name_key = 'property_name'
