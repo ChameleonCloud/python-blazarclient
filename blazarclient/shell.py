@@ -28,11 +28,8 @@ from oslo_utils import encodeutils
 
 from blazarclient import client as blazar_client
 from blazarclient import exception
-<<<<<<< HEAD
 from blazarclient.v1.shell_commands import devices
-=======
 from blazarclient.v1.shell_commands import allocations
->>>>>>> 30eab20 (Add Resource Allocations API support)
 from blazarclient.v1.shell_commands import floatingips
 from blazarclient.v1.shell_commands import hosts
 from blazarclient.v1.shell_commands import leases
