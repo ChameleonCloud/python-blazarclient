@@ -272,7 +272,7 @@ class ListDeviceProperties(command.ListCommand):
 
 
 class UpdateDeviceProperty(command.UpdatePropertyCommand):
-    """Update attributes of a device capability."""
+    """Update attributes of a device property."""
     resource = 'device'
     json_indent = 4
     log = logging.getLogger(__name__ + '.UpdateDeviceProperty')

@@ -69,7 +69,7 @@ class NetworkClientManager(base.BaseClientManager):
             allocations = sorted(allocations, key=lambda l: l[sort_by])
         return allocations
 
-    def list_capabilities(self, detail=False, sort_by=None):
+    def list_properties(self, detail=False, all=False, sort_by=None):
         url = '/networks/properties'
 
         if detail:
@@ -81,7 +81,7 @@ class NetworkClientManager(base.BaseClientManager):
         # Values is a reserved word in cliff so need to rename values column.
         if detail:
             for p in resource_properties:
-                p['capability_values'] = p['values']
+                p['property_values'] = p['values']
                 del p['values']
 
         if sort_by:
@@ -89,16 +89,16 @@ class NetworkClientManager(base.BaseClientManager):
                                          key=lambda l: l[sort_by])
         return resource_properties
 
-    def get_capability(self, capability_name):
+    def get_property(self, property_name):
         resource_property = [
-            x for x in self.list_capabilities(detail=True)
-            if x['property'] == capability_name]
+            x for x in self.list_properties(detail=True)
+            if x['property'] == property_name]
 
         return {} if not resource_property else resource_property[0]
 
-    def set_capability(self, capability_name, private):
+    def set_property(self, property_name, private):
         data = {'private': private}
         resp, body = self.request_manager.patch(
-            '/networks/properties/%s' % capability_name, body=data)
+            '/networks/properties/%s' % property_name, body=data)
 
         return body['resource_property']
