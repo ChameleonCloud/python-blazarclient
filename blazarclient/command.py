@@ -441,9 +441,16 @@ class UpdateCapabilityCommand(BlazarCommand):
             default=False,
             help='Set capability to public.'
         )
+        parser.add_argument(
+            '--unique',
+            action='store_true',
+            default=False,
+            help='Set capability as unique.'
+        )
         return parser
 
     def args2body(self, parsed_args):
         return dict(
             capability_name=parsed_args.capability_name,
-            private=(parsed_args.private is True))
+            private=(parsed_args.private is True),
+            is_unique=(parsed_args.unique is True))

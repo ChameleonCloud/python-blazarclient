@@ -213,7 +213,7 @@ class ListHostCapabilities(command.ListCommand):
     """List host capabilities."""
     resource = 'host'
     log = logging.getLogger(__name__ + '.ListHostCapabilities')
-    list_columns = ['property', 'private', 'capability_values']
+    list_columns = ['property', 'private', 'capability_values', 'is_unique']
 
     def args2body(self, parsed_args):
         params = {'detail': parsed_args.detail}
