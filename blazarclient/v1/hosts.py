@@ -100,8 +100,8 @@ class ComputeHostClientManager(base.BaseClientManager):
 
         return {} if not resource_property else resource_property[0]
 
-    def set_capability(self, capability_name, private):
-        data = {'private': private}
+    def set_capability(self, capability_name, private, is_unique=False):
+        data = {'private': private, 'is_unique': is_unique}
         resp, body = self.request_manager.patch(
             '/os-hosts/properties/%s' % capability_name, body=data)
 
