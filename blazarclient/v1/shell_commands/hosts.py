@@ -260,7 +260,7 @@ class ListHostProperties(command.ListCommand):
     """List host properties."""
     resource = 'host'
     log = logging.getLogger(__name__ + '.ListHostProperties')
-    list_columns = ['property', 'private', 'property_values']
+    list_columns = ['property', 'private', 'property_values', 'is_unique']
 
     def args2body(self, parsed_args):
         params = {

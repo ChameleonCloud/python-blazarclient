@@ -465,9 +465,16 @@ class UpdatePropertyCommand(BlazarCommand):
             default=False,
             help='Set property to public.'
         )
+        parser.add_argument(
+            '--unique',
+            action='store_true',
+            default=False,
+            help='Set capability as unique.'
+        )
         return parser
 
     def args2body(self, parsed_args):
         return dict(
             property_name=parsed_args.property_name,
+            is_unique=(parsed_args.unique is True),
             private=(parsed_args.private is True))

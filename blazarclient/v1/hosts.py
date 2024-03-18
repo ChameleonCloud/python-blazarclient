@@ -105,10 +105,10 @@ class ComputeHostClientManager(base.BaseClientManager):
             if x['property'] == property_name]
         if not resource_property:
             raise exception.ResourcePropertyNotFound()
-        return resource_property[0]
+        return {} if not resource_property else resource_property[0]
 
-    def set_property(self, property_name, private):
-        data = {'private': private}
+    def set_property(self, property_name, private, is_unique=False):
+        data = {'private': private, 'is_unique': is_unique}
         resp, body = self.request_manager.patch(
             '/os-hosts/properties/%s' % property_name, body=data)
 
