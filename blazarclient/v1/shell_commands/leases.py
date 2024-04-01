@@ -105,6 +105,21 @@ class ShowLease(command.ShowCommand):
     name_key = 'name'
     log = logging.getLogger(__name__ + '.ShowLease')
 
+    def get_parser(self, prog_name):
+        parser = super(ShowLease, self).get_parser(prog_name)
+        parser.add_argument(
+            '--detail',
+            action='store_true',
+            help='Return all resources reserved in lease.',
+            default=False
+        )
+        return parser
+
+    def args2body(self, parsed_args):
+        params = {}
+        params['detail'] = parsed_args.detail
+        return params
+
 
 class CreateLeaseBase(command.CreateCommand):
     """Create a lease."""

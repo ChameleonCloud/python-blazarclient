@@ -316,6 +316,7 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
+        body = self.args2body(parsed_args)
         blazar_client = self.get_client()
 
         if self.allow_names:
@@ -328,7 +329,7 @@ class ShowCommand(BlazarCommand, show.ShowOne):
             res_id = parsed_args.id
 
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.get(res_id)
+        data = resource_manager.get(res_id, detail=body['detail'])
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
