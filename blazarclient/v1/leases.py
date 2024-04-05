@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from concurrent.futures import ThreadPoolExecutor
+
 from oslo_utils import timeutils
 
 from blazarclient import base
@@ -38,9 +40,16 @@ class LeaseClientManager(base.BaseClientManager):
         """
         resp, body = self.request_manager.get('/leases/%s' % lease_id)
         if detail and body['lease']:
-            body['lease']['hosts'] = self.hosts_in_lease(lease_id)
-            body['lease']['networks'] = self.networks_in_lease(lease_id)
-            body['lease']['devices'] = self.devices_in_lease(lease_id)
+            with ThreadPoolExecutor() as executor:
+                # Submit the calls
+                h_future = executor.submit(self.hosts_in_lease, lease_id)
+                n_future = executor.submit(self.networks_in_lease, lease_id)
+                d_future = executor.submit(self.devices_in_lease, lease_id)
+
+                # Retrieve the results
+                body['lease']['hosts'] = h_future.result()
+                body['lease']['networks'] = n_future.result()
+                body['lease']['devices'] = d_future.result()
         return body['lease']
 
     def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
