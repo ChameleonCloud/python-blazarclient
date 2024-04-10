@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from concurrent.futures import ThreadPoolExecutor
+
 from oslo_utils import timeutils
 
 from blazarclient import base
@@ -32,11 +34,22 @@ class LeaseClientManager(base.BaseClientManager):
         resp, body = self.request_manager.post('/leases', body=values)
         return body['lease']
 
-    def get(self, lease_id):
+    def get(self, lease_id, detail=False):
         """Describes lease specifications such as name, status and locked
         condition.
         """
         resp, body = self.request_manager.get('/leases/%s' % lease_id)
+        if detail and body['lease']:
+            with ThreadPoolExecutor() as executor:
+                # Submit the calls
+                h_future = executor.submit(self.hosts_in_lease, lease_id)
+                n_future = executor.submit(self.networks_in_lease, lease_id)
+                d_future = executor.submit(self.devices_in_lease, lease_id)
+
+                # Retrieve the results
+                body['lease']['hosts'] = h_future.result()
+                body['lease']['networks'] = n_future.result()
+                body['lease']['devices'] = d_future.result()
         return body['lease']
 
     def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
@@ -93,6 +106,21 @@ class LeaseClientManager(base.BaseClientManager):
         if sort_by:
             leases = sorted(leases, key=lambda l: l[sort_by])
         return leases
+
+    def hosts_in_lease(self, lease_id):
+        """List all hosts in lease"""
+        resp, body = self.request_manager.get(f'/leases/{lease_id}/hosts')
+        return body['hosts']
+
+    def networks_in_lease(self, lease_id):
+        """List all networks in lease"""
+        resp, body = self.request_manager.get(f'/leases/{lease_id}/networks')
+        return body['networks']
+
+    def devices_in_lease(self, lease_id):
+        """List all devices in lease"""
+        resp, body = self.request_manager.get(f'/leases/{lease_id}/devices')
+        return body['devices']
 
     def _add_lease_date(self, values, lease, key, delta_date, positive_delta):
         delta_sec = utils.from_elapsed_time_to_delta(

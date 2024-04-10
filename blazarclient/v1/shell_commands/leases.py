@@ -135,6 +135,12 @@ class ShowLease(command.ShowCommand):
 
     def get_parser(self, prog_name):
         parser = super(ShowLease, self).get_parser(prog_name)
+        parser.add_argument(
+            '--detail',
+            action='store_true',
+            help='Return all resources reserved in lease.',
+            default=False
+        )
         if self.allow_names:
             help_str = 'ID or name of %s to look up'
         else:
@@ -142,6 +148,11 @@ class ShowLease(command.ShowCommand):
         parser.add_argument('id', metavar=self.resource.upper(),
                             help=help_str % self.resource)
         return parser
+
+    def args2body(self, parsed_args):
+        params = {}
+        params['detail'] = parsed_args.detail
+        return params
 
 
 class CreateLeaseBase(command.CreateCommand):
