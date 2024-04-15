@@ -39,17 +39,6 @@ class LeaseClientManager(base.BaseClientManager):
         condition.
         """
         resp, body = self.request_manager.get('/leases/%s' % lease_id)
-        if detail and body['lease']:
-            with ThreadPoolExecutor() as executor:
-                # Submit the calls
-                h_future = executor.submit(self.hosts_in_lease, lease_id)
-                n_future = executor.submit(self.networks_in_lease, lease_id)
-                d_future = executor.submit(self.devices_in_lease, lease_id)
-
-                # Retrieve the results
-                body['lease']['hosts'] = h_future.result()
-                body['lease']['networks'] = n_future.result()
-                body['lease']['devices'] = d_future.result()
         return body['lease']
 
     def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
@@ -106,6 +95,20 @@ class LeaseClientManager(base.BaseClientManager):
         if sort_by:
             leases = sorted(leases, key=lambda l: l[sort_by])
         return leases
+
+    def additional_details(self, lease_id):
+        allocations = {}
+        with ThreadPoolExecutor() as executor:
+            # Submit the calls
+            h_future = executor.submit(self.hosts_in_lease, lease_id)
+            n_future = executor.submit(self.networks_in_lease, lease_id)
+            d_future = executor.submit(self.devices_in_lease, lease_id)
+
+            # Retrieve the results
+            allocations['hosts'] = h_future.result()
+            allocations['networks'] = n_future.result()
+            allocations['devices'] = d_future.result()
+        return allocations
 
     def hosts_in_lease(self, lease_id):
         """List all hosts in lease"""
