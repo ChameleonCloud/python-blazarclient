@@ -329,7 +329,9 @@ class ShowCommand(BlazarCommand, show.ShowOne):
             res_id = parsed_args.id
 
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.get(res_id, detail=body['detail'])
+        data = resource_manager.get(res_id)
+        if body.get('detail'):
+            data.update(resource_manager.additional_details(res_id))
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
