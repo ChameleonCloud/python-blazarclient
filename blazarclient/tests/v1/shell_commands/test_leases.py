@@ -334,11 +334,32 @@ class ShowLeaseTestCase(tests.TestCase):
         ]
         mock.seal(lease_manager)
 
-        args = argparse.Namespace(id=FIRST_LEASE)
+        args = argparse.Namespace(id=FIRST_LEASE, detail=False)
         expected = [('id',), (FIRST_LEASE,)]
 
         self.assertEqual(show_lease.get_data(args), expected)
         lease_manager.get.assert_called_once_with(FIRST_LEASE)
+
+    def test_show_lease_with_allocations(self):
+        show_lease, lease_manager = self.create_show_command()
+        lease_manager.get.return_value = {'id': FIRST_LEASE}
+        lease_manager.additional_details.return_value = {
+            'hosts': [],
+            'networks': [],
+            'devices': []
+        }
+        lease_manager.list.return_value = [
+            {'id': FIRST_LEASE, 'name': 'first-lease'},
+            {'id': SECOND_LEASE, 'name': 'second-lease'},
+        ]
+        mock.seal(lease_manager)
+
+        args = argparse.Namespace(id=FIRST_LEASE, detail=True)
+        expected = [('devices', 'hosts', 'id', 'networks',), ('', '', FIRST_LEASE, '',)]
+
+        self.assertEqual(show_lease.get_data(args), expected)
+        lease_manager.get.assert_called_once_with(FIRST_LEASE)
+        lease_manager.additional_details.assert_called_once_with(FIRST_LEASE)
 
     def test_show_lease_by_name(self):
         show_lease, lease_manager = self.create_show_command()
@@ -349,12 +370,39 @@ class ShowLeaseTestCase(tests.TestCase):
         lease_manager.get.return_value = {'id': SECOND_LEASE}
         mock.seal(lease_manager)
 
-        args = argparse.Namespace(id='second-lease')
+        args = argparse.Namespace(id='second-lease', detail=False)
         expected = [('id',), (SECOND_LEASE,)]
 
         self.assertEqual(show_lease.get_data(args), expected)
         lease_manager.list.assert_called_once_with()
         lease_manager.get.assert_called_once_with(SECOND_LEASE)
+
+    def test_show_lease_by_name_with_allocations(self):
+        show_lease, lease_manager = self.create_show_command()
+        lease_manager.list.return_value = [
+            {'id': FIRST_LEASE, 'name': 'first-lease'},
+            {'id': SECOND_LEASE, 'name': 'second-lease'},
+        ]
+        lease_manager.get.return_value = {'id': SECOND_LEASE}
+        host1 = {'id': '101', 'hypervisor_hostname': 'host-1'}
+        lease_manager.additional_details.return_value = {
+            'hosts': [host1],
+            'networks': [],
+            'devices': []
+        }
+        import json
+        d = json.dumps(host1, indent=4)
+        mock.seal(lease_manager)
+        args = argparse.Namespace(id='second-lease', detail=True)
+        expected = [
+            ('devices', 'hosts', 'id', 'networks',),
+            ('', d, SECOND_LEASE, '',)
+        ]
+
+        self.assertEqual(show_lease.get_data(args), expected)
+        lease_manager.list.assert_called_once_with()
+        lease_manager.get.assert_called_once_with(SECOND_LEASE)
+        lease_manager.additional_details.assert_called_once_with(SECOND_LEASE)
 
 
 class DeleteLeaseTestCase(tests.TestCase):
