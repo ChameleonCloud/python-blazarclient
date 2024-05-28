@@ -66,6 +66,12 @@ CREATE_RESERVATION_KEYS = {
         "resource_properties": "",
         "resource_type": 'device'
     },
+    "flavor:instance": {
+        "flavor_id": "",
+        "amount": "",
+        "affinity": "None",
+        "resource_type": 'flavor:instance'
+    },
     "others": {
         ".*": None
     }
@@ -245,6 +251,8 @@ class CreateLeaseBase(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['network']
             elif "device" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['device']
+            elif "flavor:instance" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['flavor:instance']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
