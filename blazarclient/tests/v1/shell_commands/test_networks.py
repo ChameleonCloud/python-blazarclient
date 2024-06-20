@@ -26,7 +26,9 @@ class CreateNetworkTest(tests.TestCase):
 
     def setUp(self):
         super(CreateNetworkTest, self).setUp()
-        self.create_network = networks.CreateNetwork(shell.BlazarShell(), mock.Mock())
+        self.create_network = networks.CreateNetwork(
+            shell.BlazarShell(), mock.Mock()
+        )
 
     def test_args2body(self):
         args = argparse.Namespace(
@@ -62,14 +64,24 @@ class UpdateNetworkTest(tests.TestCase):
 
         blazar_shell = shell.BlazarShell()
         blazar_shell.client = mock_client
-        return networks.UpdateNetwork(blazar_shell, mock.Mock()), mock_network_manager
+        return networks.UpdateNetwork(
+            blazar_shell, mock.Mock()
+        ), mock_network_manager
 
     def test_update_network(self):
         list_value = [
-            {'id': '072c58c0-64ac-467b-b040-9138771e146a', 'networkname': 'network-1'},
-            {'id': '072c58c0-64ac-467b-b040-9138771e146a', 'networkname': 'network-2'},
+            {
+                'id': '072c58c0-64ac-467b-b040-9138771e146a',
+                'networkname': 'network-1'
+            },
+            {
+                'id': '072c58c0-64ac-467b-b040-9138771e146a',
+                'networkname': 'network-2'
+            },
         ]
-        update_network, network_manager = self.create_update_command(list_value)
+        update_network, network_manager = self.create_update_command(
+            list_value
+        )
         args = argparse.Namespace(
             id='072c58c0-64ac-467b-b040-9138771e146a',
             extra_capabilities=[
@@ -83,7 +95,9 @@ class UpdateNetworkTest(tests.TestCase):
             }
         }
         update_network.run(args)
-        network_manager.update.assert_called_once_with('072c58c0-64ac-467b-b040-9138771e146a', **expected)
+        network_manager.update.assert_called_once_with(
+            '072c58c0-64ac-467b-b040-9138771e146a', **expected
+        )
 
 
 class UnsetAttributesNetworkTest(tests.TestCase):
@@ -103,8 +117,14 @@ class UnsetAttributesNetworkTest(tests.TestCase):
 
     def test_unset_network(self):
         list_value = [
-            {'id': '072c58c0-64ac-467b-b040-9138771e146a', 'networkname': 'network-1'},
-            {'id': '072c58c0-64ac-467b-b040-9138771e146b', 'networkname': 'network-2'},
+            {
+                'id': '072c58c0-64ac-467b-b040-9138771e146a',
+                'networkname': 'network-1'
+            },
+            {
+                'id': '072c58c0-64ac-467b-b040-9138771e146b',
+                'networkname': 'network-2'
+            },
         ]
         unset_network, network_manager = self.create_unset_command(list_value)
         extra_caps = ['key1', 'key2']
@@ -114,12 +134,14 @@ class UnsetAttributesNetworkTest(tests.TestCase):
         )
         expected = {
             'values': {key: None for key in extra_caps}
-       }
+        }
         unset_network.run(args)
-        network_manager.update.assert_called_once_with('072c58c0-64ac-467b-b040-9138771e146a', **expected)
+        network_manager.update.assert_called_once_with(
+            '072c58c0-64ac-467b-b040-9138771e146a', **expected
+        )
+
 
 class ShowNetworkTest(tests.TestCase):
-
     def create_show_command(self, list_value, get_value):
         mock_network_manager = mock.Mock()
         mock_network_manager.list.return_value = list_value
@@ -130,7 +152,9 @@ class ShowNetworkTest(tests.TestCase):
 
         blazar_shell = shell.BlazarShell()
         blazar_shell.client = mock_client
-        return networks.ShowNetwork(blazar_shell, mock.Mock()), mock_network_manager
+        return networks.ShowNetwork(
+            blazar_shell, mock.Mock()
+        ), mock_network_manager
 
     def test_show_network(self):
         list_value = [
@@ -140,8 +164,9 @@ class ShowNetworkTest(tests.TestCase):
         get_value = {
             'id': '072c58c0-64ac-467b-b040-9138771e146a'}
 
-        show_network, network_manager = self.create_show_command(list_value,
-                                                           get_value)
+        show_network, network_manager = self.create_show_command(
+            list_value, get_value
+        )
 
         args = argparse.Namespace(id='072c58c0-64ac-467b-b040-9138771e146a')
         expected = [('id',), ('072c58c0-64ac-467b-b040-9138771e146a',)]
@@ -149,7 +174,9 @@ class ShowNetworkTest(tests.TestCase):
         ret = show_network.get_data(args)
         self.assertEqual(ret, expected)
 
-        network_manager.get.assert_called_once_with('072c58c0-64ac-467b-b040-9138771e146a')
+        network_manager.get.assert_called_once_with(
+            '072c58c0-64ac-467b-b040-9138771e146a'
+        )
 
 
 class DeleteNetworkTest(tests.TestCase):
@@ -163,24 +190,37 @@ class DeleteNetworkTest(tests.TestCase):
 
         blazar_shell = shell.BlazarShell()
         blazar_shell.client = mock_client
-        return networks.DeleteNetwork(blazar_shell, mock.Mock()), mock_network_manager
+        return networks.DeleteNetwork(
+            blazar_shell, mock.Mock()
+        ), mock_network_manager
 
     def test_delete_network(self):
         # ID should be of format of blazarclient.command.UUID_PATTERN
         list_value = [
-            {'id': '072c58c0-64ac-467b-b040-9138771e146a', 'networkname': 'network-1'},
-            {'id': '072c58c0-64ac-467b-b040-9138771e146b', 'networkname': 'network-2'},
+            {
+                'id': '072c58c0-64ac-467b-b040-9138771e146a',
+                'networkname': 'network-1'},
+            {
+                'id': '072c58c0-64ac-467b-b040-9138771e146b',
+                'networkname': 'network-2'
+            },
         ]
-        delete_network, network_manager = self.create_delete_command(list_value)
+        delete_network, network_manager = self.create_delete_command(
+            list_value
+        )
 
         args = argparse.Namespace(id='072c58c0-64ac-467b-b040-9138771e146a')
         delete_network.run(args)
 
-        network_manager.delete.assert_called_once_with('072c58c0-64ac-467b-b040-9138771e146a')
+        network_manager.delete.assert_called_once_with(
+            '072c58c0-64ac-467b-b040-9138771e146a'
+        )
+
 
 class MockNetworkClientManager(NetworkClientManager):
     def __init__(self):
         self.request_manager = MockRequestManager()
+
 
 class MockRequestManager:
     def get(self, url):
@@ -216,7 +256,6 @@ class MockRequestManager:
 
 
 class ListNetworksTest(tests.TestCase):
-
     def create_list_command(self):
         mock_network_manager = MockNetworkClientManager()
 
@@ -225,7 +264,9 @@ class ListNetworksTest(tests.TestCase):
 
         blazar_shell = shell.BlazarShell()
         blazar_shell.client = mock_client
-        return networks.ListNetworks(blazar_shell, mock.Mock()), mock_network_manager
+        return networks.ListNetworks(
+            blazar_shell, mock.Mock()
+        ), mock_network_manager
 
     def test_list_network_sort_by(self):
 
@@ -241,4 +282,3 @@ class ListNetworksTest(tests.TestCase):
             network_segment_id = network[segment_id_index]
             self.assertLess(prev_segment_id, network_segment_id)
             prev_segment_id = network_segment_id
-        # network_manager.list.assert_called_once_with(sort_by='segment_id')

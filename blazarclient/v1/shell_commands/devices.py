@@ -141,7 +141,8 @@ class UnsetAttributeDevice(UpdateDevice):
             action='append',
             dest='extra_capabilities',
             default=[],
-            help='Extra capability keys which should be unset from the device.',
+            help='Extra capability keys which should be unset'
+            'from the device.',
         )
         return parser
 

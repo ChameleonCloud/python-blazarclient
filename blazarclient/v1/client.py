@@ -65,11 +65,11 @@ class Client(object):
             version=self.version,
             **kwargs)
         self.network = networks.NetworkClientManager(
-                blazar_url=self.blazar_url,
-                auth_token=self.auth_token,
-                session=self.session,
-                version=self.version,
-                **kwargs)
+            blazar_url=self.blazar_url,
+            auth_token=self.auth_token,
+            session=self.session,
+            version=self.version,
+            **kwargs)
         self.device = devices.DeviceClientManager(
             blazar_url=self.blazar_url,
             auth_token=self.auth_token,
