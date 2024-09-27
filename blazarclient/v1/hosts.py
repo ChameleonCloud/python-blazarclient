@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from blazarclient import base
+from blazarclient import exception
 from blazarclient.i18n import _
 
 
@@ -73,11 +74,16 @@ class ComputeHostClientManager(base.BaseClientManager):
             '/os-hosts/%s/allocation' % host_id, body=values)
         return body['allocation']
 
-    def list_capabilities(self, detail=False, sort_by=None):
+    def list_properties(self, detail=False, all=False, sort_by=None):
         url = '/os-hosts/properties'
 
+        query_parts = []
         if detail:
-            url += '?detail=True'
+            query_parts.append("detail=True")
+        if all:
+            query_parts.append("all=True")
+        if query_parts:
+            url += "?" + "&".join(query_parts)
 
         resp, body = self.request_manager.get(url)
         resource_properties = body['resource_properties']
@@ -85,7 +91,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         # Values is a reserved word in cliff so need to rename values column.
         if detail:
             for p in resource_properties:
-                p['capability_values'] = p['values']
+                p['property_values'] = p['values']
                 del p['values']
 
         if sort_by:
@@ -93,16 +99,17 @@ class ComputeHostClientManager(base.BaseClientManager):
                                          key=lambda l: l[sort_by])
         return resource_properties
 
-    def get_capability(self, capability_name):
+    def get_property(self, property_name):
         resource_property = [
-            x for x in self.list_capabilities(detail=True)
-            if x['property'] == capability_name]
-
+            x for x in self.list_properties(detail=True)
+            if x['property'] == property_name]
+        if not resource_property:
+            raise exception.ResourcePropertyNotFound()
         return {} if not resource_property else resource_property[0]
 
-    def set_capability(self, capability_name, private, is_unique=False):
+    def set_property(self, property_name, private, is_unique=False):
         data = {'private': private, 'is_unique': is_unique}
         resp, body = self.request_manager.patch(
-            '/os-hosts/properties/%s' % capability_name, body=data)
+            '/os-hosts/properties/%s' % property_name, body=data)
 
         return body['resource_property']

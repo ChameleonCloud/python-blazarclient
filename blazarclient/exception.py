@@ -96,3 +96,9 @@ class IncorrectNetwork(BlazarClientException):
     """Occurs if network parameters are incorrect."""
     message = _("The network parameters are incorrect.")
     code = 409
+
+
+class ResourcePropertyNotFound(BlazarClientException):
+    """Occurs if the resource property specified does not exist"""
+    message = _("The resource property does not exist.")
+    code = 404
