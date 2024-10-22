@@ -214,24 +214,21 @@ class ReallocateDevice(command.ReallocateCommand):
         return params
 
 
-class ShowDeviceProperty(command.ShowPropertyCommand):
-    """Show device property."""
+class ShowDeviceCapability(command.ShowCapabilityCommand):
+    """Show device capability."""
     resource = 'device'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.ShowDeviceProperty')
+    log = logging.getLogger(__name__ + '.ShowDeviceCapability')
 
 
-class ListDeviceProperties(command.ListCommand):
-    """List device properties."""
+class ListDeviceCapabilities(command.ListCommand):
+    """List device capabilities."""
     resource = 'device'
-    log = logging.getLogger(__name__ + '.ListDeviceProperties')
-    list_columns = ['property', 'private', 'property_values']
+    log = logging.getLogger(__name__ + '.ListDeviceCapabilities')
+    list_columns = ['property', 'private', 'capability_values']
 
     def args2body(self, parsed_args):
-        params = {
-            'detail': parsed_args.detail,
-            'all': parsed_args.all,
-        }
+        params = {'detail': parsed_args.detail}
         if parsed_args.sort_by:
             if parsed_args.sort_by in self.list_columns:
                 params['sort_by'] = parsed_args.sort_by
@@ -246,34 +243,28 @@ class ListDeviceProperties(command.ListCommand):
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.list_properties(**body)
+        data = resource_manager.list_capabilities(**body)
         return data
 
     def get_parser(self, prog_name):
-        parser = super(ListDeviceProperties, self).get_parser(prog_name)
+        parser = super(ListDeviceCapabilities, self).get_parser(prog_name)
         parser.add_argument(
             '--detail',
             action='store_true',
-            help='Return properties with values and attributes.',
+            help='Return capabilities with values and attributes.',
             default=False
         )
         parser.add_argument(
-            '--sort-by', metavar="<property_column>",
+            '--sort-by', metavar="<extra_capability_column>",
             help='column name used to sort result',
             default='property'
-        )
-        parser.add_argument(
-            '--all',
-            action='store_true',
-            help='Return all properties, public and private.',
-            default=False
         )
         return parser
 
 
-class UpdateDeviceProperty(command.UpdatePropertyCommand):
-    """Update attributes of a device property."""
+class UpdateDeviceCapability(command.UpdateCapabilityCommand):
+    """Update attributes of a device capability."""
     resource = 'device'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.UpdateDeviceProperty')
-    name_key = 'property_name'
+    log = logging.getLogger(__name__ + '.UpdateDeviceCapability')
+    name_key = 'capability_name'

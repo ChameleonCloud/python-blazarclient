@@ -306,10 +306,17 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
     def get_parser(self, prog_name):
         parser = super(ShowCommand, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'ID or name of %s to look up'
+        else:
+            help_str = 'ID of %s to look up'
+        parser.add_argument('id', metavar=self.resource.upper(),
+                            help=help_str % self.resource)
         return parser
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
+        body = self.args2body(parsed_args)
         blazar_client = self.get_client()
 
         if self.allow_names:
@@ -323,6 +330,8 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get(res_id)
+        if body.get('detail'):
+            data.update(resource_manager.additional_details(res_id))
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
@@ -378,7 +387,7 @@ class ReallocateCommand(BlazarCommand):
         return
 
 
-class ShowPropertyCommand(BlazarCommand, show.ShowOne):
+class ShowCapabilityCommand(BlazarCommand, show.ShowOne):
     """Show information of a given resource."""
 
     api = 'reservation'
@@ -386,22 +395,21 @@ class ShowPropertyCommand(BlazarCommand, show.ShowOne):
     log = None
 
     def get_parser(self, prog_name):
-        parser = super(ShowPropertyCommand, self).get_parser(prog_name)
-        parser.add_argument('property_name', metavar='PROPERTY_NAME',
-                            help='Name of property.')
+        parser = super(ShowCapabilityCommand, self).get_parser(prog_name)
+        parser.add_argument('capability_name', metavar='CAPABILITY_NAME',
+                            help='Name of extra capablity.')
         return parser
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
         blazar_client = self.get_client()
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.get_property(parsed_args.property_name)
-        if parsed_args.formatter == 'table':
-            self.format_output_data(data)
+        data = resource_manager.get_capability(parsed_args.capability_name)
+        self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 
-class UpdatePropertyCommand(BlazarCommand):
+class UpdateCapabilityCommand(BlazarCommand):
     api = 'reservation'
     resource = None
     log = None
@@ -411,34 +419,41 @@ class UpdatePropertyCommand(BlazarCommand):
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
-        resource_manager.set_property(**body)
+        resource_manager.set_capability(**body)
         print(
-            'Updated %s property: %s' % (
-                self.resource, parsed_args.property_name),
+            'Updated %s extra capability: %s' % (
+                self.resource, parsed_args.capability_name),
             file=self.app.stdout)
         return
 
     def get_parser(self, prog_name):
-        parser = super(UpdatePropertyCommand, self).get_parser(prog_name)
+        parser = super(UpdateCapabilityCommand, self).get_parser(prog_name)
         parser.add_argument(
-            'property_name', metavar='PROPERTY_NAME',
-            help='Name of property to patch.'
+            'capability_name', metavar='CAPABILITY_NAME',
+            help='Name of extra capability to patch.'
         )
         parser.add_argument(
             '--private',
             action='store_true',
             default=False,
-            help='Set property to private.'
+            help='Set capability to private.'
         )
         parser.add_argument(
             '--public',
             action='store_true',
             default=False,
-            help='Set property to public.'
+            help='Set capability to public.'
+        )
+        parser.add_argument(
+            '--unique',
+            action='store_true',
+            default=False,
+            help='Set capability as unique.'
         )
         return parser
 
     def args2body(self, parsed_args):
         return dict(
-            property_name=parsed_args.property_name,
-            private=(parsed_args.private is True))
+            capability_name=parsed_args.capability_name,
+            private=(parsed_args.private is True),
+            is_unique=(parsed_args.unique is True))

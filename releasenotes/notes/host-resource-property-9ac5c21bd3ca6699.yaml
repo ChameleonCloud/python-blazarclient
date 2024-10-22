@@ -1,9 +1,0 @@
----
-features:
-  - |
-    Added support for managing host resource properties using the following new
-    commands:
-
-    * ``host-property-list``
-    * ``host-property-show``
-    * ``host-property-set``

@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from concurrent.futures import ThreadPoolExecutor
+
 from oslo_utils import timeutils
 
 from blazarclient import base
@@ -32,7 +34,7 @@ class LeaseClientManager(base.BaseClientManager):
         resp, body = self.request_manager.post('/leases', body=values)
         return body['lease']
 
-    def get(self, lease_id):
+    def get(self, lease_id, detail=False):
         """Describes lease specifications such as name, status and locked
         condition.
         """
@@ -93,6 +95,35 @@ class LeaseClientManager(base.BaseClientManager):
         if sort_by:
             leases = sorted(leases, key=lambda l: l[sort_by])
         return leases
+
+    def additional_details(self, lease_id):
+        allocations = {}
+        with ThreadPoolExecutor() as executor:
+            # Submit the calls
+            h_future = executor.submit(self.hosts_in_lease, lease_id)
+            n_future = executor.submit(self.networks_in_lease, lease_id)
+            d_future = executor.submit(self.devices_in_lease, lease_id)
+
+            # Retrieve the results
+            allocations['hosts'] = h_future.result()
+            allocations['networks'] = n_future.result()
+            allocations['devices'] = d_future.result()
+        return allocations
+
+    def hosts_in_lease(self, lease_id):
+        """List all hosts in lease"""
+        resp, body = self.request_manager.get(f'/leases/{lease_id}/hosts')
+        return body['hosts']
+
+    def networks_in_lease(self, lease_id):
+        """List all networks in lease"""
+        resp, body = self.request_manager.get(f'/leases/{lease_id}/networks')
+        return body['networks']
+
+    def devices_in_lease(self, lease_id):
+        """List all devices in lease"""
+        resp, body = self.request_manager.get(f'/leases/{lease_id}/devices')
+        return body['devices']
 
     def _add_lease_date(self, values, lease, key, delta_date, positive_delta):
         delta_sec = utils.from_elapsed_time_to_delta(

@@ -29,7 +29,6 @@ from oslo_utils import encodeutils
 from blazarclient import client as blazar_client
 from blazarclient import exception
 from blazarclient.v1.shell_commands import devices
-from blazarclient.v1.shell_commands import allocations
 from blazarclient.v1.shell_commands import floatingips
 from blazarclient.v1.shell_commands import hosts
 from blazarclient.v1.shell_commands import leases
@@ -51,9 +50,9 @@ COMMANDS_V1 = {
     'host-allocation-show': hosts.ShowHostAllocation,
     'host-allocation-list': hosts.ListHostAllocations,
     'host-reallocate': hosts.ReallocateHost,
-    'host-property-list': hosts.ListHostProperties,
-    'host-property-show': hosts.ShowHostProperty,
-    'host-property-set': hosts.UpdateHostProperty,
+    'host-capability-list': hosts.ListHostCapabilities,
+    'host-capability-show': hosts.ShowHostCapability,
+    'host-capability-set': hosts.UpdateHostCapability,
     'network-list': networks.ListNetworks,
     'network-show': networks.ShowNetwork,
     'network-create': networks.CreateNetwork,
@@ -62,9 +61,9 @@ COMMANDS_V1 = {
     'network-delete': networks.DeleteNetwork,
     'network-allocation-show': networks.ShowNetworkAllocation,
     'network-allocation-list': networks.ListNetworkAllocations,
-    'network-property-list': networks.ListNetworkProperties,
-    'network-property-show': networks.ShowNetworkProperty,
-    'network-property-set': networks.UpdateNetworkProperty,
+    'network-capability-list': networks.ListNetworkCapabilities,
+    'network-capability-show': networks.ShowNetworkCapability,
+    'network-capability-set': networks.UpdateNetworkCapability,
     'floatingip-list': floatingips.ListFloatingIPs,
     'floatingip-show': floatingips.ShowFloatingIP,
     'floatingip-create': floatingips.CreateFloatingIP,
@@ -78,11 +77,9 @@ COMMANDS_V1 = {
     'device-allocation-show': devices.ShowDeviceAllocation,
     'device-allocation-list': devices.ListDeviceAllocations,
     'device-reallocate': devices.ReallocateDevice,
-    'device-property-list': devices.ListDeviceProperties,
-    'device-property-show': devices.ShowDeviceProperty,
-    'device-property-set': devices.UpdateDeviceProperty,
-    'allocation-list': allocations.ListAllocations,
-    'allocation-show': allocations.ShowAllocations,
+    'device-capability-list': devices.ListDeviceCapabilities,
+    'device-capability-show': devices.ShowDeviceCapability,
+    'device-capability-set': devices.UpdateDeviceCapability,
 }
 
 VERSION = 1
