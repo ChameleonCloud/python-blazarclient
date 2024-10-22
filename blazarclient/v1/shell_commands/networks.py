@@ -198,31 +198,27 @@ class ListNetworkAllocations(command.ListAllocationCommand):
         return parser
 
 
-class ShowNetworkProperty(command.ShowPropertyCommand):
+class ShowNetworkCapability(command.ShowCapabilityCommand):
     """Show network capability."""
     resource = 'network'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.ShowNetworkProperty')
+    log = logging.getLogger(__name__ + '.ShowNetworkCapability')
 
 
-class ListNetworkProperties(command.ListCommand):
+class ListNetworkCapabilities(command.ListCommand):
     """List network capabilities."""
     resource = 'network'
-    log = logging.getLogger(__name__ + '.ListNetworkProperties')
-    list_columns = ['property', 'private', 'property_values']
+    log = logging.getLogger(__name__ + '.ListNetworkCapabilities')
+    list_columns = ['property', 'private', 'capability_values']
 
     def args2body(self, parsed_args):
-        params = {
-            'detail': parsed_args.detail,
-            'all': parsed_args.all,
-        }
+        params = {'detail': parsed_args.detail}
         if parsed_args.sort_by:
             if parsed_args.sort_by in self.list_columns:
                 params['sort_by'] = parsed_args.sort_by
             else:
                 msg = 'Invalid sort option %s' % parsed_args.sort_by
                 raise exception.BlazarClientException(msg)
-
         return params
 
     def retrieve_list(self, parsed_args):
@@ -230,33 +226,27 @@ class ListNetworkProperties(command.ListCommand):
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.list_properties(**body)
+        data = resource_manager.list_capabilities(**body)
         return data
 
     def get_parser(self, prog_name):
-        parser = super(ListNetworkProperties, self).get_parser(prog_name)
+        parser = super(ListNetworkCapabilities, self).get_parser(prog_name)
         parser.add_argument(
             '--detail',
             action='store_true',
-            help='Return properties with values and attributes.',
+            help='Return capabilities with values and attributes.',
             default=False
         )
         parser.add_argument(
-            '--sort-by', metavar="<property_column>",
+            '--sort-by', metavar="<extra_capability_column>",
             help='column name used to sort result',
             default='property'
-        )
-        parser.add_argument(
-            '--all',
-            action='store_true',
-            help='Return all properties, public and private.',
-            default=False
         )
         return parser
 
 
-class UpdateNetworkProperty(command.UpdatePropertyCommand):
+class UpdateNetworkCapability(command.UpdateCapabilityCommand):
     """Update attributes of a network capability."""
     resource = 'network'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.UpdateNetworkProperty')
+    log = logging.getLogger(__name__ + '.UpdateNetworkCapability')

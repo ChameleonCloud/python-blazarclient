@@ -47,16 +47,6 @@ class ShowHost(command.ShowCommand):
     id_pattern = HOST_ID_PATTERN
     log = logging.getLogger(__name__ + '.ShowHost')
 
-    def get_parser(self, prog_name):
-        parser = super(ShowHost, self).get_parser(prog_name)
-        if self.allow_names:
-            help_str = 'ID or name of %s to look up'
-        else:
-            help_str = 'ID of %s to look up'
-        parser.add_argument('id', metavar=self.resource.upper(),
-                            help=help_str % self.resource)
-        return parser
-
 
 class CreateHost(command.CreateCommand):
     """Create a host."""
@@ -212,24 +202,21 @@ class ReallocateHost(command.ReallocateCommand):
         return params
 
 
-class ShowHostProperty(command.ShowPropertyCommand):
-    """Show host property."""
+class ShowHostCapability(command.ShowCapabilityCommand):
+    """Show host capability."""
     resource = 'host'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.ShowHostProperty')
+    log = logging.getLogger(__name__ + '.ShowHostCapability')
 
 
-class ListHostProperties(command.ListCommand):
-    """List host properties."""
+class ListHostCapabilities(command.ListCommand):
+    """List host capabilities."""
     resource = 'host'
-    log = logging.getLogger(__name__ + '.ListHostProperties')
-    list_columns = ['property', 'private', 'property_values', 'is_unique']
+    log = logging.getLogger(__name__ + '.ListHostCapabilities')
+    list_columns = ['property', 'private', 'capability_values', 'is_unique']
 
     def args2body(self, parsed_args):
-        params = {
-            'detail': parsed_args.detail,
-            'all': parsed_args.all,
-        }
+        params = {'detail': parsed_args.detail}
         if parsed_args.sort_by:
             if parsed_args.sort_by in self.list_columns:
                 params['sort_by'] = parsed_args.sort_by
@@ -244,34 +231,28 @@ class ListHostProperties(command.ListCommand):
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
-        data = resource_manager.list_properties(**body)
+        data = resource_manager.list_capabilities(**body)
         return data
 
     def get_parser(self, prog_name):
-        parser = super(ListHostProperties, self).get_parser(prog_name)
+        parser = super(ListHostCapabilities, self).get_parser(prog_name)
         parser.add_argument(
             '--detail',
             action='store_true',
-            help='Return properties with values and attributes.',
+            help='Return capabilities with values and attributes.',
             default=False
         )
         parser.add_argument(
-            '--sort-by', metavar="<property_column>",
+            '--sort-by', metavar="<extra_capability_column>",
             help='column name used to sort result',
             default='property'
-        )
-        parser.add_argument(
-            '--all',
-            action='store_true',
-            help='Return all properties, public and private.',
-            default=False
         )
         return parser
 
 
-class UpdateHostProperty(command.UpdatePropertyCommand):
-    """Update attributes of a host property."""
+class UpdateHostCapability(command.UpdateCapabilityCommand):
+    """Update attributes of a host capability."""
     resource = 'host'
     json_indent = 4
-    log = logging.getLogger(__name__ + '.UpdateHostProperty')
-    name_key = 'property_name'
+    log = logging.getLogger(__name__ + '.UpdateHostCapability')
+    name_key = 'capability_name'
