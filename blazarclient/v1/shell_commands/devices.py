@@ -41,6 +41,16 @@ class ShowDevice(command.ShowCommand):
     name_key = 'name'
     log = logging.getLogger(__name__ + '.ShowDevice')
 
+    def get_parser(self, prog_name):
+        parser = super(ShowDevice, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'Name or ID of %s to look up'
+        else:
+            help_str = 'ID of %s to look up'
+        parser.add_argument('id', metavar=self.resource.upper(),
+                            help=help_str % self.resource)
+        return parser
+
 
 class CreateDevice(command.CreateCommand):
     """Create a device."""

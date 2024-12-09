@@ -39,7 +39,18 @@ class ShowNetwork(command.ShowCommand):
     """Show network details."""
     resource = 'network'
     json_indent = 4
+    name_key = 'segment_id'
     log = logging.getLogger(__name__ + '.ShowNetwork')
+
+    def get_parser(self, prog_name):
+        parser = super(ShowNetwork, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'Segment ID or ID of %s to look up'
+        else:
+            help_str = 'ID of %s to look up'
+        parser.add_argument('id', metavar=self.resource.upper(),
+                            help=help_str % self.resource)
+        return parser
 
 
 class CreateNetwork(command.CreateCommand):
