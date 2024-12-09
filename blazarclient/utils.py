@@ -125,9 +125,8 @@ def _find_resource_id_by_name(client, resource_type, name, name_key):
 
     named_resources = []
     key = name_key if name_key else 'name'
-
     for resource in resources:
-        if resource.get(key) == name:
+        if str(resource.get(key)) == name:
             named_resources.append(resource['id'])
     if len(named_resources) > 1:
         raise exception.NoUniqueMatch(message="There are more than one "
