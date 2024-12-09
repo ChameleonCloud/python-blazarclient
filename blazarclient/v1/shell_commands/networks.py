@@ -191,6 +191,16 @@ class ShowNetworkAllocation(command.ShowAllocationCommand):
     json_indent = 4
     log = logging.getLogger(__name__ + '.ShowNetworkAllocation')
 
+    def get_parser(self, prog_name):
+        parser = super(ShowNetworkAllocation, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'Segment ID or ID of %s to look up'
+        else:
+            help_str = 'ID of %s to look up'
+        parser.add_argument('id', metavar=self.resource.upper(),
+                            help=help_str % self.resource)
+        return parser
+
 
 class ListNetworkAllocations(command.ListAllocationCommand):
     """List network allocations."""
