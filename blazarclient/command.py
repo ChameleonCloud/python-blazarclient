@@ -330,6 +330,17 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 class ShowAllocationCommand(ShowCommand, show.ShowOne):
     """Show allocations for a given resource."""
 
+    def get_parser(self, prog_name):
+        parser = super(ShowAllocationCommand, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'ID or name of %s to show allocations'
+        else:
+            help_str = 'ID of %s to show allocations'
+        parser.add_argument(
+            'id', metavar=self.resource.upper(),
+            help=help_str % self.resource)
+        return parser
+
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
         blazar_client = self.get_client()

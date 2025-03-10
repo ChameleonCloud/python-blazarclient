@@ -164,6 +164,7 @@ class ShowHostAllocation(command.ShowAllocationCommand):
     resource = 'host'
     json_indent = 4
     id_pattern = HOST_ID_PATTERN
+    allow_names = False
     log = logging.getLogger(__name__ + '.ShowHostAllocation')
 
 
