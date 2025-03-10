@@ -199,6 +199,12 @@ class ReallocateHost(command.ReallocateCommand):
         parser.add_argument(
             '--reservation-id',
             help='Reservation ID to reallocate host from')
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help='Force reallocation off the host, regardless of if an alternate host is found',
+            default=False
+        )
         return parser
 
     def args2body(self, parsed_args):
@@ -208,6 +214,8 @@ class ReallocateHost(command.ReallocateCommand):
             params['reservation_id'] = parsed_args.reservation_id
         elif parsed_args.lease_id:
             params['lease_id'] = parsed_args.lease_id
+        if parsed_args.force:
+            params['force'] = parsed_args.force
 
         return params
 
