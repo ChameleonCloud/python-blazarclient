@@ -273,6 +273,11 @@ class ListCommand(BlazarCommand, lister.Lister):
             columns = {
                           col for col in self.list_columns if col in columns
                       } | valid_parsed_columns
+            # sort the columns based on list_columns
+            sorting_map = {item: i for i, item in enumerate(self.list_columns)}
+            # sort key is either index of item in list_columns, or placed at end of list
+            columns = sorted(columns, key=lambda x: sorting_map.get(x, len(self.list_columns)))
+
         return (
             columns,
             (utils.get_item_properties(s, columns, formatters=self._formatters)
