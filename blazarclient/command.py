@@ -92,30 +92,6 @@ class BlazarCommand(OpenStackCommand):
         parser = super(BlazarCommand, self).get_parser(prog_name)
         return parser
 
-    def format_output_data(self, data):
-        for k, v in data.items():
-            if isinstance(v, str):
-                try:
-                    # Deserialize if possible into dict, lists, tuples...
-                    v = ast.literal_eval(v)
-                except SyntaxError:
-                    # NOTE(sbauza): This is probably a datetime string, we need
-                    #               to keep it unchanged.
-                    pass
-                except ValueError:
-                    # NOTE(sbauza): This is not something AST can evaluate,
-                    #               probably a string.
-                    pass
-            if isinstance(v, list):
-                value = '\n'.join(utils.dumps(
-                    i, indent=self.json_indent) if isinstance(i, dict)
-                    else str(i) for i in v)
-                data[k] = value
-            elif isinstance(v, dict):
-                value = utils.dumps(v, indent=self.json_indent)
-                data[k] = value
-            elif v is None:
-                data[k] = ''
 
     def add_known_arguments(self, parser):
         pass
@@ -137,7 +113,6 @@ class CreateCommand(BlazarCommand, show.ShowOne):
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.create(**body)
-        self.format_output_data(data)
 
         if data:
             print('Created a new %s:' % self.resource, file=self.app.stdout)
@@ -323,7 +298,6 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get(res_id)
-        self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 
@@ -346,7 +320,6 @@ class ShowAllocationCommand(ShowCommand, show.ShowOne):
         blazar_client = self.get_client()
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get_allocation(parsed_args.id)
-        self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 
@@ -407,8 +380,6 @@ class ShowPropertyCommand(BlazarCommand, show.ShowOne):
         blazar_client = self.get_client()
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get_property(parsed_args.property_name)
-        if parsed_args.formatter == 'table':
-            self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 
