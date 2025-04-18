@@ -307,12 +307,43 @@ class ListCommand(BlazarCommand, lister.Lister):
 class ListAllocationCommand(ListCommand, lister.Lister):
     """List allocations that belong to a given tenant."""
 
+    def get_parser(self, prog_name):
+        parser = super(ListAllocationCommand, self).get_parser(prog_name)
+        parser.add_argument(
+            '--lease-id', metavar="<lease_id>",
+            help='Lease to filter allocations by',
+        )
+        parser.add_argument(
+            '--username', metavar="<username>",
+            help='Username to filter allocations by',
+        )
+        return parser
+
     def retrieve_list(self, parsed_args):
         """Retrieve a list of resources from Blazar server."""
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.list_allocations(**body)
+        filters = []
+        if parsed_args.lease_id:
+            filters.append(lambda x: x['lease_id'] == parsed_args.lease_id)
+        if parsed_args.username:
+            filters.append(lambda x: x.get("extras", {}).get('user_name') == parsed_args.username)
+
+        if filters:
+            new_data = []
+            for allocation in data:
+                new_reservations = []
+                for reservation in allocation["reservations"]:
+                    if all(f(reservation) for f in filters):
+                        new_reservations.append(reservation)
+                if new_reservations:
+                    new_data.append({
+                        "resource_id": allocation["resource_id"],
+                        "reservations": new_reservations,
+                    })
+            data = new_data
         return data
 
 
