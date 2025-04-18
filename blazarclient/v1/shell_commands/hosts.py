@@ -37,7 +37,34 @@ class ListHosts(command.ListCommand):
             help='column name used to sort result',
             default='hypervisor_hostname'
         )
+        parser.add_argument(
+            '--node-type', metavar="<node_type>",
+            help='Node type to filter leases by',
+        )
+        parser.add_argument(
+            '--reservable',
+            help='List only reservable hosts',
+            action='store_true',
+            default=None,
+        )
+        parser.add_argument(
+            '--unreservable',
+            help='List only unreservable hosts',
+            action='store_false',
+            dest='reservable',
+        )
         return parser
+
+    def get_data(self, parsed_args):
+        if parsed_args.node_type:
+            self._filters.append(
+                lambda x: x['node_type'] == parsed_args.node_type
+            )
+        if parsed_args.reservable is not None:
+            self._filters.append(
+                lambda x: x['reservable'] == parsed_args.reservable
+            )
+        return super(ListHosts, self).get_data(parsed_args)
 
 
 class ShowHost(command.ShowCommand):
