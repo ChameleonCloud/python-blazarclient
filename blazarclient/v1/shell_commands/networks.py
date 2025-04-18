@@ -24,6 +24,7 @@ class ListNetworks(command.ListCommand):
     resource = 'network'
     log = logging.getLogger(__name__ + '.ListNetworks')
     list_columns = ['id', 'network_type', 'physical_network', 'segment_id']
+    long_columns = ['stitch_provider']
 
     def get_parser(self, prog_name):
         parser = super(ListNetworks, self).get_parser(prog_name)

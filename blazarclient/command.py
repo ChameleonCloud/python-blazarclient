@@ -92,31 +92,6 @@ class BlazarCommand(OpenStackCommand):
         parser = super(BlazarCommand, self).get_parser(prog_name)
         return parser
 
-    def format_output_data(self, data):
-        for k, v in data.items():
-            if isinstance(v, str):
-                try:
-                    # Deserialize if possible into dict, lists, tuples...
-                    v = ast.literal_eval(v)
-                except SyntaxError:
-                    # NOTE(sbauza): This is probably a datetime string, we need
-                    #               to keep it unchanged.
-                    pass
-                except ValueError:
-                    # NOTE(sbauza): This is not something AST can evaluate,
-                    #               probably a string.
-                    pass
-            if isinstance(v, list):
-                value = '\n'.join(utils.dumps(
-                    i, indent=self.json_indent) if isinstance(i, dict)
-                    else str(i) for i in v)
-                data[k] = value
-            elif isinstance(v, dict):
-                value = utils.dumps(v, indent=self.json_indent)
-                data[k] = value
-            elif v is None:
-                data[k] = ''
-
     def add_known_arguments(self, parser):
         pass
 
@@ -137,7 +112,6 @@ class CreateCommand(BlazarCommand, show.ShowOne):
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.create(**body)
-        self.format_output_data(data)
 
         if data:
             print('Created a new %s:' % self.resource, file=self.app.stdout)
@@ -229,12 +203,15 @@ class ListCommand(BlazarCommand, lister.Lister):
     log = None
     _formatters = {}
     list_columns = []
+    long_columns = []
     unknown_parts_flag = True
 
     def args2body(self, parsed_args):
         params = {}
         if parsed_args.sort_by:
             if parsed_args.sort_by in self.list_columns:
+                params['sort_by'] = parsed_args.sort_by
+            elif self.long_columns and parsed_args.sort_by in self.long_columns:
                 params['sort_by'] = parsed_args.sort_by
             else:
                 msg = 'Invalid sort option %s' % parsed_args.sort_by
@@ -243,6 +220,12 @@ class ListCommand(BlazarCommand, lister.Lister):
 
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
+        if self.long_columns:
+            parser.add_argument(
+                '--long',
+                action='store_true',
+                help='Display detailed information for each item'
+            )
         return parser
 
     def retrieve_list(self, parsed_args):
@@ -269,14 +252,18 @@ class ListCommand(BlazarCommand, lister.Lister):
             valid_parsed_columns = {col for col in parsed_args.columns if col in columns}
         else:
             valid_parsed_columns = set()
-        if self.list_columns:
+
+        default_columns = self.list_columns
+        if self.long_columns and parsed_args.long:
+            default_columns += self.long_columns
+        if default_columns:
             columns = {
-                          col for col in self.list_columns if col in columns
+                          col for col in default_columns if col in columns
                       } | valid_parsed_columns
             # sort the columns based on list_columns
-            sorting_map = {item: i for i, item in enumerate(self.list_columns)}
+            sorting_map = {item: i for i, item in enumerate(default_columns)}
             # sort key is either index of item in list_columns, or placed at end of list
-            columns = sorted(columns, key=lambda x: sorting_map.get(x, len(self.list_columns)))
+            columns = sorted(columns, key=lambda x: sorting_map.get(x, len(default_columns)))
 
         return (
             columns,
@@ -328,7 +315,6 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get(res_id)
-        self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 
@@ -351,7 +337,6 @@ class ShowAllocationCommand(ShowCommand, show.ShowOne):
         blazar_client = self.get_client()
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get_allocation(parsed_args.id)
-        self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 
@@ -412,8 +397,6 @@ class ShowPropertyCommand(BlazarCommand, show.ShowOne):
         blazar_client = self.get_client()
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get_property(parsed_args.property_name)
-        if parsed_args.formatter == 'table':
-            self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
 

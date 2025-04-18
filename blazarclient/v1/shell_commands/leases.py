@@ -87,6 +87,7 @@ class ListLeases(command.ListCommand):
     resource = 'lease'
     log = logging.getLogger(__name__ + '.ListLeases')
     list_columns = ['id', 'name', 'start_date', 'end_date']
+    long_columns = ["status", "created_at", "degraded"]
 
     def get_parser(self, prog_name):
         parser = super(ListLeases, self).get_parser(prog_name)

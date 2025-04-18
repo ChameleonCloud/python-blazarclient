@@ -83,7 +83,6 @@ class ShowAllocations(command.ShowCommand):
                 filter(lambda d: d['id'] == parsed_args.reservation_id,
                        data['reservations']))
 
-        self.format_output_data(data)
         return list(zip(*sorted(data.items())))
 
     def args2body(self, parsed_args):

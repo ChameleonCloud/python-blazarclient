@@ -28,6 +28,7 @@ class ListHosts(command.ListCommand):
     log = logging.getLogger(__name__ + '.ListHosts')
     list_columns = ['id', 'hypervisor_hostname', 'vcpus', 'memory_mb',
                     'local_gb']
+    long_columns = ['node_name', 'node_type', 'disabled', 'reservable']
 
     def get_parser(self, prog_name):
         parser = super(ListHosts, self).get_parser(prog_name)
