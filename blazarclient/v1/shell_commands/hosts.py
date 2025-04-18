@@ -15,12 +15,23 @@
 
 import logging
 
-from blazarclient import command
-from blazarclient import exception
+from osc_lib.cli import format_columns
+from osc_lib.command.command import Lister as osc_Lister
+from osc_lib import utils as oscutils
+
+from blazarclient import command, exception
 
 # Matches integers or UUIDs
 HOST_ID_PATTERN = r'^([0-9]+|([0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}))$'
 
+
+_formatters = {
+    "reservations": format_columns.ListDictColumn,
+}
+
+class ALLOCATION_RESOURCE:
+    fields = ["resource_id", "reservations"]
+    labels = ["resource_id", "reservations"]
 
 class ListHosts(command.ListCommand):
     """Print a list of hosts."""
@@ -168,20 +179,43 @@ class ShowHostAllocation(command.ShowAllocationCommand):
     log = logging.getLogger(__name__ + '.ShowHostAllocation')
 
 
-class ListHostAllocations(command.ListAllocationCommand):
+class ListHostAllocations(osc_Lister):
     """List host allocations."""
-    resource = 'host'
     log = logging.getLogger(__name__ + '.ListHostAllocations')
-    list_columns = ['resource_id', 'reservations']
 
     def get_parser(self, prog_name):
         parser = super(ListHostAllocations, self).get_parser(prog_name)
         parser.add_argument(
-            '--sort-by', metavar="<host_column>",
-            help='column name used to sort result',
-            default='resource_id'
+            "--sort-by",
+            metavar="<allocation_column>",
+            help="column name used to sort result",
+            default="resource_id",
         )
         return parser
+    
+    def take_action(self, parsed_args):
+        self.log.debug("take_action(%s)", parsed_args)
+
+        client = self.app.client_manager.reservation
+
+        columns = ALLOCATION_RESOURCE.fields
+        labels = ALLOCATION_RESOURCE.labels
+
+        params = {}
+        params["resource"] = 'os-hosts'
+
+        self.log.debug("params(%s)", params)
+        data = client.allocation.list(**params)
+
+        data = oscutils.sort_items(data, parsed_args.sort_by)
+
+        output_data = (
+            oscutils.get_dict_properties(
+                allocation_dict, columns, formatters=_formatters
+            )
+            for allocation_dict in data
+        )
+        return (labels, output_data)
 
 
 class ReallocateHost(command.ReallocateCommand):

@@ -63,10 +63,7 @@ class ComputeHostClientManager(base.BaseClientManager):
     def list_allocations(self, sort_by=None):
         """List allocations for all hosts."""
         resp, body = self.request_manager.get('/os-hosts/allocations')
-        allocations = body['allocations']
-        if sort_by:
-            allocations = sorted(allocations, key=lambda l: l[sort_by])
-        return allocations
+        return body['allocations']
 
     def reallocate(self, host_id, values):
         """Reallocate host from leases."""
