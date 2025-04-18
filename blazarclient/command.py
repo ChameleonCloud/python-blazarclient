@@ -229,6 +229,7 @@ class ListCommand(BlazarCommand, lister.Lister):
     list_columns = []
     long_columns = []
     unknown_parts_flag = True
+    _filters = []
 
     def args2body(self, parsed_args):
         params = {}
@@ -258,6 +259,8 @@ class ListCommand(BlazarCommand, lister.Lister):
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.list(**body)
+        for f in self._filters:
+            data = list(filter(f, data))
         return data
 
     def setup_columns(self, info, parsed_args):
@@ -282,8 +285,8 @@ class ListCommand(BlazarCommand, lister.Lister):
             default_columns += self.long_columns
         if default_columns:
             columns = {
-                          col for col in default_columns if col in columns
-                      } | valid_parsed_columns
+                col for col in default_columns if col in columns
+            } | valid_parsed_columns
             # sort the columns based on list_columns
             sorting_map = {item: i for i, item in enumerate(default_columns)}
             # sort key is either index of item in list_columns, or placed at end of list

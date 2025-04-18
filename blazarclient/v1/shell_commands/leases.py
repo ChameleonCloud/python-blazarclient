@@ -96,7 +96,34 @@ class ListLeases(command.ListCommand):
             help='column name used to sort result',
             default='name'
         )
+        parser.add_argument(
+            '--project-id', metavar="<project_id>",
+            help='ID of the project to filter leases by',
+        )
+        parser.add_argument(
+            '--status', metavar="<status>",
+            help='status to filter leases by',
+        )
+        parser.add_argument(
+            '--user', metavar="<user_id>",
+            help='User ID to filter leases by',
+        )
         return parser
+
+    def get_data(self, parsed_args):
+        if parsed_args.project_id:
+            self._filters.append(
+                lambda x: x['project_id'] == parsed_args.project_id
+            )
+        if parsed_args.status:
+            self._filters.append(
+                lambda x: x['status'].lower() == parsed_args.status.lower()
+            )
+        if parsed_args.user:
+            self._filters.append(
+                lambda x: x['user_id'] == parsed_args.user
+            )
+        return super(ListLeases, self).get_data(parsed_args)
 
 
 class ShowLease(command.ShowCommand):
