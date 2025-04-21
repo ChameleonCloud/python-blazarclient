@@ -390,8 +390,6 @@ class ShowLeaseTestCase(tests.TestCase):
             'networks': [],
             'devices': []
         }
-        import json
-        d = json.dumps(host1, indent=4)
         mock.seal(lease_manager)
         args = argparse.Namespace(id='second-lease', detail=True, formatter="table")
         expected = [

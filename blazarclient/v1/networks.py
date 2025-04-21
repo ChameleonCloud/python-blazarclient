@@ -52,7 +52,7 @@ class NetworkClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/networks')
         networks = body['networks']
         if sort_by:
-            networks = sorted(networks, key=lambda l: l[sort_by])
+            networks = sorted(networks, key=lambda network: network[sort_by])
         return networks
 
     def get_allocation(self, network_id):
@@ -66,7 +66,7 @@ class NetworkClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/networks/allocations')
         allocations = body['allocations']
         if sort_by:
-            allocations = sorted(allocations, key=lambda l: l[sort_by])
+            allocations = sorted(allocations, key=lambda alloc: alloc[sort_by])
         return allocations
 
     def list_properties(self, detail=False, all=False, sort_by=None):
@@ -86,7 +86,7 @@ class NetworkClientManager(base.BaseClientManager):
 
         if sort_by:
             resource_properties = sorted(resource_properties,
-                                         key=lambda l: l[sort_by])
+                                         key=lambda prop: prop[sort_by])
         return resource_properties
 
     def get_property(self, property_name):
