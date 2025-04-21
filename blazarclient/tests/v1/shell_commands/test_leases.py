@@ -334,7 +334,7 @@ class ShowLeaseTestCase(tests.TestCase):
         ]
         mock.seal(lease_manager)
 
-        args = argparse.Namespace(id=FIRST_LEASE, detail=False)
+        args = argparse.Namespace(id=FIRST_LEASE, detail=False, formatter="table")
         expected = [('id',), (FIRST_LEASE,)]
 
         self.assertEqual(show_lease.get_data(args), expected)
@@ -354,8 +354,8 @@ class ShowLeaseTestCase(tests.TestCase):
         ]
         mock.seal(lease_manager)
 
-        args = argparse.Namespace(id=FIRST_LEASE, detail=True)
-        expected = [('devices', 'hosts', 'id', 'networks',), ('', '', FIRST_LEASE, '',)]
+        args = argparse.Namespace(id=FIRST_LEASE, detail=True, formatter="table")
+        expected = [('devices', 'hosts', 'id', 'networks',), ('[]', '[]', FIRST_LEASE, '[]',)]
 
         self.assertEqual(show_lease.get_data(args), expected)
         lease_manager.get.assert_called_once_with(FIRST_LEASE)
@@ -370,7 +370,7 @@ class ShowLeaseTestCase(tests.TestCase):
         lease_manager.get.return_value = {'id': SECOND_LEASE}
         mock.seal(lease_manager)
 
-        args = argparse.Namespace(id='second-lease', detail=False)
+        args = argparse.Namespace(id='second-lease', detail=False, formatter="table")
         expected = [('id',), (SECOND_LEASE,)]
 
         self.assertEqual(show_lease.get_data(args), expected)
@@ -393,12 +393,11 @@ class ShowLeaseTestCase(tests.TestCase):
         import json
         d = json.dumps(host1, indent=4)
         mock.seal(lease_manager)
-        args = argparse.Namespace(id='second-lease', detail=True)
+        args = argparse.Namespace(id='second-lease', detail=True, formatter="table")
         expected = [
             ('devices', 'hosts', 'id', 'networks',),
-            ('', d, SECOND_LEASE, '',)
+            ('[]', '[\n    {\n        "id": "101",\n        "hypervisor_hostname": "host-1"\n    }\n]', '424d21c3-45a2-448a-81ad-32eddc888375', '[]')
         ]
-
         self.assertEqual(show_lease.get_data(args), expected)
         lease_manager.list.assert_called_once_with()
         lease_manager.get.assert_called_once_with(SECOND_LEASE)

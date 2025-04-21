@@ -143,7 +143,7 @@ class ShowNetworkTest(tests.TestCase):
         show_network, network_manager = self.create_show_command(list_value,
                                                            get_value)
 
-        args = argparse.Namespace(id='072c58c0-64ac-467b-b040-9138771e146a')
+        args = argparse.Namespace(id='072c58c0-64ac-467b-b040-9138771e146a', formatter="table")
         expected = [('id',), ('072c58c0-64ac-467b-b040-9138771e146a',)]
 
         ret = show_network.get_data(args)
@@ -232,7 +232,9 @@ class ListNetworksTest(tests.TestCase):
         list_network, network_manager = self.create_list_command()
         list_networks_args = argparse.Namespace(
             sort_by='segment_id',
-            columns=[]
+            columns=[],
+            formatter="table",
+            long=False,
         )
         return_networks = list_network.get_data(list_networks_args)
         segment_id_index = list(return_networks[0]).index('segment_id')
