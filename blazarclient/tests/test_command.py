@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 from unittest import mock
 
 import testtools
@@ -84,10 +85,11 @@ class BlazarCommandTestCase(tests.TestCase):
                        'key_none': None}
         data_after = {'key_string': 'string_value',
                       'key_dict': '{"key": "value"}',
-                      'key_list': '1\n2\n3',
+                      'key_list': '["1", "2", "3"]',
                       'key_none': ''}
 
-        self.command.format_output_data(data_before)
+        args = argparse.Namespace(formatter="table")
+        self.command.format_output_data(data_before, args)
 
         self.assertEqual(data_after, data_before)
 

@@ -104,7 +104,7 @@ class ShowFloatingIPTest(tests.TestCase):
         show_floatingip, floatingip_manager = self.create_show_command(
             list_value, get_value)
 
-        args = argparse.Namespace(id='84c4d37e-1f8b-45ce-897b-16ad7f49b0e9')
+        args = argparse.Namespace(id='84c4d37e-1f8b-45ce-897b-16ad7f49b0e9', formatter="table")
         expected = [('id',), ('84c4d37e-1f8b-45ce-897b-16ad7f49b0e9',)]
 
         ret = show_floatingip.get_data(args)

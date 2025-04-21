@@ -178,7 +178,7 @@ class ShowHostTest(tests.TestCase):
         show_host, host_manager = self.create_show_command(list_value,
                                                            get_value)
 
-        args = argparse.Namespace(id='101')
+        args = argparse.Namespace(id='101', formatter="table")
         expected = [('hypervisor_hostname', 'id'), ('host-1', '101')]
 
         ret = show_host.get_data(args)
@@ -197,7 +197,7 @@ class ShowHostTest(tests.TestCase):
         show_host, host_manager = self.create_show_command(list_value,
                                                            get_value)
 
-        args = argparse.Namespace(id='host-1')
+        args = argparse.Namespace(id='host-1', formatter="table")
         expected = [('hypervisor_hostname', 'id'), ('host-1', '101')]
 
         ret = show_host.get_data(args)
@@ -215,7 +215,7 @@ class ShowHostTest(tests.TestCase):
 
         show_host, host_manager = self.create_show_command(list_value,
                                                            get_value)
-        args = argparse.Namespace(id='1-host')
+        args = argparse.Namespace(id='1-host', formatter="table")
         expected = [('hypervisor_hostname', 'id'), ('1-host', '101')]
 
         ret = show_host.get_data(args)

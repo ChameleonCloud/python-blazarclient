@@ -22,7 +22,8 @@ class ListDevices(command.ListCommand):
     """Print a list of devices."""
     resource = 'device'
     log = logging.getLogger(__name__ + '.ListDevices')
-    list_columns = ['id', 'name', 'device_type', 'device_driver']
+    list_columns = ['id', 'name', 'device_type']
+    long_columns = ['machine_name', 'model', 'device_name', 'device_driver', 'reservable']
 
     def get_parser(self, prog_name):
         parser = super(ListDevices, self).get_parser(prog_name)

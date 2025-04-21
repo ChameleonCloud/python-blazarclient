@@ -50,7 +50,7 @@ class DeviceClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/devices')
         devices = body['devices']
         if sort_by:
-            devices = sorted(devices, key=lambda l: l[sort_by])
+            devices = sorted(devices, key=lambda dev: dev[sort_by])
         return devices
 
     def get_allocation(self, device_id):
@@ -64,7 +64,7 @@ class DeviceClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/devices/allocations')
         allocations = body['allocations']
         if sort_by:
-            allocations = sorted(allocations, key=lambda l: l[sort_by])
+            allocations = sorted(allocations, key=lambda alloc: alloc[sort_by])
         return allocations
 
     def reallocate(self, device_id, values):
@@ -90,7 +90,7 @@ class DeviceClientManager(base.BaseClientManager):
 
         if sort_by:
             resource_properties = sorted(resource_properties,
-                                         key=lambda l: l[sort_by])
+                                         key=lambda prop: prop[sort_by])
         return resource_properties
 
     def get_property(self, property_name):

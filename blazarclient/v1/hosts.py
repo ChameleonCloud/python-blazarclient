@@ -51,7 +51,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/os-hosts')
         hosts = body['hosts']
         if sort_by:
-            hosts = sorted(hosts, key=lambda l: l[sort_by])
+            hosts = sorted(hosts, key=lambda host: host[sort_by])
         return hosts
 
     def get_allocation(self, host_id):
@@ -65,7 +65,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/os-hosts/allocations')
         allocations = body['allocations']
         if sort_by:
-            allocations = sorted(allocations, key=lambda l: l[sort_by])
+            allocations = sorted(allocations, key=lambda alloc: alloc[sort_by])
         return allocations
 
     def reallocate(self, host_id, values):
@@ -96,7 +96,7 @@ class ComputeHostClientManager(base.BaseClientManager):
 
         if sort_by:
             resource_properties = sorted(resource_properties,
-                                         key=lambda l: l[sort_by])
+                                         key=lambda lease: lease[sort_by])
         return resource_properties
 
     def get_property(self, property_name):
@@ -105,10 +105,10 @@ class ComputeHostClientManager(base.BaseClientManager):
             if x['property'] == property_name]
         if not resource_property:
             raise exception.ResourcePropertyNotFound()
-        return resource_property[0]
+        return {} if not resource_property else resource_property[0]
 
-    def set_property(self, property_name, private):
-        data = {'private': private}
+    def set_property(self, property_name, private, is_unique=False):
+        data = {'private': private, 'is_unique': is_unique}
         resp, body = self.request_manager.patch(
             '/os-hosts/properties/%s' % property_name, body=data)
 

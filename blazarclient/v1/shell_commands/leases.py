@@ -87,6 +87,7 @@ class ListLeases(command.ListCommand):
     resource = 'lease'
     log = logging.getLogger(__name__ + '.ListLeases')
     list_columns = ['id', 'name', 'start_date', 'end_date']
+    long_columns = ["status", "created_at", "degraded"]
 
     def get_parser(self, prog_name):
         parser = super(ListLeases, self).get_parser(prog_name)
@@ -95,7 +96,34 @@ class ListLeases(command.ListCommand):
             help='column name used to sort result',
             default='name'
         )
+        parser.add_argument(
+            '--project-id', metavar="<project_id>",
+            help='ID of the project to filter leases by',
+        )
+        parser.add_argument(
+            '--status', metavar="<status>",
+            help='status to filter leases by',
+        )
+        parser.add_argument(
+            '--user', metavar="<user_id>",
+            help='User ID to filter leases by',
+        )
         return parser
+
+    def get_data(self, parsed_args):
+        if parsed_args.project_id:
+            self._filters.append(
+                lambda x: x['project_id'] == parsed_args.project_id
+            )
+        if parsed_args.status:
+            self._filters.append(
+                lambda x: x['status'].lower() == parsed_args.status.lower()
+            )
+        if parsed_args.user:
+            self._filters.append(
+                lambda x: x['user_id'] == parsed_args.user
+            )
+        return super(ListLeases, self).get_data(parsed_args)
 
 
 class ShowLease(command.ShowCommand):
@@ -107,6 +135,12 @@ class ShowLease(command.ShowCommand):
 
     def get_parser(self, prog_name):
         parser = super(ShowLease, self).get_parser(prog_name)
+        parser.add_argument(
+            '--detail',
+            action='store_true',
+            help='Return all resources reserved in lease.',
+            default=False
+        )
         if self.allow_names:
             help_str = 'ID or name of %s to look up'
         else:
@@ -114,6 +148,11 @@ class ShowLease(command.ShowCommand):
         parser.add_argument('id', metavar=self.resource.upper(),
                             help=help_str % self.resource)
         return parser
+
+    def args2body(self, parsed_args):
+        params = {}
+        params['detail'] = parsed_args.detail
+        return params
 
 
 class CreateLeaseBase(command.CreateCommand):
