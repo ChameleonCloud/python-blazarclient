@@ -10,7 +10,6 @@ on:
     branches:
       - "*"
   pull_request:
-    types: [opened, reopened]
 
 jobs:
   run_linting:
