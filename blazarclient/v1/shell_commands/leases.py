@@ -108,7 +108,18 @@ class ListLeases(command.ListCommand):
             '--user', metavar="<user_id>",
             help='User ID to filter leases by',
         )
+        parser.add_argument(
+            '--all-tenants',
+            action='store_true',
+            help='List leases from all projects (admin only).',
+            default=False
+        )
         return parser
+
+    def args2body(self, parsed_args):
+        params = super(ListLeases, self).args2body(parsed_args)
+        params["all_tenants"] = parsed_args.all_tenants
+        return params
 
     def get_data(self, parsed_args):
         if parsed_args.project_id:
