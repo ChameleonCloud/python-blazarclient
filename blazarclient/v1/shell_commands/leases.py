@@ -114,11 +114,22 @@ class ListLeases(command.ListCommand):
             help='List leases from all projects (admin only).',
             default=False
         )
+        parser.add_argument(
+            '--limit', metavar="<num_leases>",
+            help='Maximum number of leases to return',
+        )
+        parser.add_argument(
+            '--marker', metavar="<lease>",
+            help='Only return leases after specified lease',
+        )
+
         return parser
 
     def args2body(self, parsed_args):
         params = super(ListLeases, self).args2body(parsed_args)
         params["all_tenants"] = parsed_args.all_tenants
+        params["limit"] = parsed_args.limit
+        params["marker"] = parsed_args.marker
         return params
 
     def get_data(self, parsed_args):
