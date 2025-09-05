@@ -88,12 +88,29 @@ class LeaseClientManager(base.BaseClientManager):
         """Deletes lease with specified ID."""
         resp, body = self.request_manager.delete('/leases/%s' % lease_id)
 
-    def list(self, sort_by=None, all_tenants=False, limit=None, marker=None):
+    def list(self,
+            sort_by=None,
+            all_tenants=False,
+            status=None,
+            project_id=None,
+            lease_id=None,
+            lease_name=None,
+            limit=None,
+            marker=None
+    ):
         """List all leases."""
         url = '/leases'
         query_parts = []
         if all_tenants:
             query_parts.append("all_tenants=True")
+        if status:
+            query_parts.append(f"status={status}")
+        if project_id:
+            query_parts.append(f"project_id={project_id}")
+        if lease_id:
+            query_parts.append(f"lease_id={lease_id}")
+        if lease_name:
+            query_parts.append(f"lease_name={lease_name}")
         if limit:
             query_parts.append(f"limit={limit}")
         if marker:
