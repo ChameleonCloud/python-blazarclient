@@ -126,6 +126,14 @@ class RequestManagerTestCase(tests.TestCase):
         kwargs = {"body": {"req_key": "req_value"}}
         self.assertRaises(exception.BlazarClientException,
                           self.manager.request, url, "POST", **kwargs)
+        
+    @mock.patch('requests.request')
+    def test_request_fail_notfound(self, m):
+        m.return_value.status_code = 404
+        m.return_value.text = "resp"
+        url = '/leases'
+        self.assertRaises(exception.NotFound,
+                          self.manager.request, url, "GET")
 
 
 class SessionClientTestCase(tests.TestCase):
@@ -156,6 +164,20 @@ class SessionClientTestCase(tests.TestCase):
         kwargs = {"body": {"req_key": "req_value"}}
         self.assertRaises(exception.BlazarClientException,
                           self.manager.request, url, "POST", **kwargs)
+        
+    @mock.patch('blazarclient.base.adapter.LegacyJsonAdapter.request')
+    def test_request_fail_notfound(self, m):
+        resp = mock.Mock()
+        resp.status_code = 404
+        body = {"error message": "error"}
+        m.return_value = (resp, body)
+        url = '/leases'
+        kwargs = {"body": {"req_key": "req_value"}}
+        self.assertRaises(exception.NotFound,
+                          self.manager.request, url, "POST", **kwargs)
+        
+
+
 
 
 class BaseClientManagerTestCase(tests.TestCase):
@@ -188,3 +210,5 @@ class BaseClientManagerTestCase(tests.TestCase):
                           blazar_url=None,
                           auth_token=self.auth_token,
                           session=None)
+        
+    

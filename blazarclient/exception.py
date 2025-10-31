@@ -98,7 +98,19 @@ class IncorrectNetwork(BlazarClientException):
     code = 409
 
 
-class ResourcePropertyNotFound(BlazarClientException):
+class NotFound(BlazarClientException):
+    """HTTP 404 - Not Found.
+
+    The requested resource could not be found but may be available again
+    in the future.
+    """
+    message = _("Not Found")
+    code = 404
+
+class ResourcePropertyNotFound(NotFound):
     """Occurs if the resource property specified does not exist"""
     message = _("The resource property does not exist.")
-    code = 404
+
+class ResourceNotFound(NotFound):
+    """Occurs if specified resource does not exist"""
+    message = _("The resource does not exist.")

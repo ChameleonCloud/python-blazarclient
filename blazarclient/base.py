@@ -113,7 +113,10 @@ class RequestManager(object):
                 error_message = resp.text
 
             body = _("ERROR: {0}").format(error_message)
-            raise exception.BlazarClientException(body, code=resp.status_code)
+            if resp.status_code == 404:
+                raise exception.NotFound(body, code=resp.status_code)
+            else:
+                raise exception.BlazarClientException(body, code=resp.status_code)
 
         return resp, body
 
@@ -132,7 +135,11 @@ class SessionClient(adapter.LegacyJsonAdapter):
                 error_message = resp.text
 
             msg = _("ERROR: {0}").format(error_message)
-            raise exception.BlazarClientException(msg, code=resp.status_code)
+
+            if resp.status_code == 404:
+                raise exception.NotFound(msg, code=resp.status_code)
+            else:
+                raise exception.BlazarClientException(msg, code=resp.status_code)
 
         return resp, body
 
