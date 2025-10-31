@@ -137,7 +137,7 @@ def _find_resource_id_by_name(client, resource_type, name, name_key):
         return named_resources[0]
     else:
         message = "Unable to find resource with name '%s'" % name
-        raise exception.BlazarClientException(message=message,
+        raise exception.ResourceNotFound(message=message,
                                               status_code=404)
 
 
