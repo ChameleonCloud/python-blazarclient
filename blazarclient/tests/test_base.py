@@ -126,7 +126,24 @@ class RequestManagerTestCase(tests.TestCase):
         kwargs = {"body": {"req_key": "req_value"}}
         self.assertRaises(exception.BlazarClientException,
                           self.manager.request, url, "POST", **kwargs)
+        
+    @mock.patch('requests.request')
+    def test_request_fail_notfound(self, m):
 
+        m.return_value.status_code = 404
+        m.return_value.text = "{\"error_code\": 404, \"error_message\": \"Object with {'lease_id': 'aaa-bbb-ccc'} not found\", \"error_name\": 404}"
+        url = '/leases/aaa-bbb-ccc'
+
+        try:
+            resp, body = self.manager.get(url)
+        except exception.BlazarClientException as exc:
+            self.assertEqual(exc.code, 404)
+            print(exc)
+        else:
+            # Fail if we don't have the expected exception
+            # Hack because testtools doesn't support AssertRaises as context Manager
+            self.assertFalse(True)
+        m.assert_called_once()
 
 class SessionClientTestCase(tests.TestCase):
 
