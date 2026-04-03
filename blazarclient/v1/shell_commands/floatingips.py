@@ -84,3 +84,19 @@ class DeleteFloatingIP(command.DeleteCommand):
     resource = 'floatingip'
     allow_names = False
     log = logging.getLogger(__name__ + '.DeleteFloatingIP')
+
+
+class ListFloatingIPAllocations(command.ListAllocationCommand):
+    """Print a list of floating IP allocations."""
+    resource = 'floatingip'
+    log = logging.getLogger(__name__ + '.ListFloatingIPAllocations')
+    list_columns = ['resource_id', 'reservations']
+
+    def get_parser(self, prog_name):
+        parser = super(ListFloatingIPAllocations, self).get_parser(prog_name)
+        parser.add_argument(
+            '--sort-by', metavar="<floatingip_allocation_column>",
+            help='column name used to sort result',
+            default='resource_id'
+        )
+        return parser

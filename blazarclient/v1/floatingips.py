@@ -45,3 +45,11 @@ class FloatingIPClientManager(base.BaseClientManager):
         if sort_by:
             floatingips = sorted(floatingips, key=lambda ip: ip[sort_by])
         return floatingips
+
+    def list_allocations(self, sort_by=None):
+        """List allocations for all floating IPs."""
+        resp, body = self.request_manager.get('/floatingips/allocations')
+        allocations = body['allocations']
+        if sort_by:
+            allocations = sorted(allocations, key=lambda alloc: alloc[sort_by])
+        return allocations
