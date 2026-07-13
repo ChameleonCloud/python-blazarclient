@@ -18,6 +18,7 @@ import re
 
 from oslo_serialization import jsonutils
 from oslo_utils import strutils
+from oslo_utils import timeutils
 
 import argparse
 from blazarclient import command
@@ -76,16 +77,6 @@ CREATE_RESERVATION_KEYS = {
         ".*": None
     }
 }
-
-
-def _utc_now():
-    """Wrap datetime.datetime.utcnow so it can be mocked in unit tests.
-
-    This is required because some of the tests require understanding the
-    'current time'; simply mocking utcnow() is made very difficult by
-    the many different ways the datetime package is used in this module.
-    """
-    return datetime.datetime.utcnow()
 
 
 class ListLeases(command.ListCommand):
@@ -190,7 +181,7 @@ class CreateLeaseBase(command.CreateCommand):
     json_indent = 4
     log = logging.getLogger(__name__ + '.CreateLease')
     default_start = 'now'
-    default_end = _utc_now() + datetime.timedelta(days=1)
+    default_end = timeutils.utcnow() + datetime.timedelta(days=1)
 
     def get_parser(self, prog_name):
         parser = super(CreateLeaseBase, self).get_parser(prog_name)
@@ -266,7 +257,7 @@ class CreateLeaseBase(command.CreateCommand):
                 raise exception.IncorrectLease
 
         if parsed_args.start == 'now':
-            start = _utc_now()
+            start = timeutils.utcnow()
         else:
             start = parsed_args.start
 

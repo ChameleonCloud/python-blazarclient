@@ -97,7 +97,7 @@ class ComputeHostClientManager(base.BaseClientManager):
 
         if sort_by:
             resource_properties = sorted(resource_properties,
-                                         key=lambda lease: lease[sort_by])
+                                         key=lambda rp: rp[sort_by])
         return resource_properties
 
     def get_property(self, property_name):

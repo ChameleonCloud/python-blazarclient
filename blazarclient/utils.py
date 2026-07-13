@@ -22,7 +22,7 @@ from oslo_serialization import jsonutils as json
 from blazarclient import exception
 from blazarclient.i18n import _
 
-ELAPSED_TIME_REGEX = '^(\d+)([s|m|h|d])$' # noqa W605
+ELAPSED_TIME_REGEX = r'^(\d+)([s|m|h|d])$'
 
 LEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 API_DATE_FORMAT = '%Y-%m-%d %H:%M'
@@ -53,8 +53,6 @@ def to_primitive(value):
         return o
     elif isinstance(value, datetime.datetime):
         return str(value)
-    elif hasattr(value, 'iteritems'):
-        return to_primitive(dict(value.items()))
     elif hasattr(value, '__iter__'):
         return to_primitive(list(value))
     else:

@@ -43,7 +43,7 @@ class FloatingIPClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/floatingips')
         floatingips = body['floatingips']
         if sort_by:
-            floatingips = sorted(floatingips, key=lambda ip: ip[sort_by])
+            floatingips = sorted(floatingips, key=lambda fip: fip[sort_by])
         return floatingips
 
     def list_allocations(self, sort_by=None):
