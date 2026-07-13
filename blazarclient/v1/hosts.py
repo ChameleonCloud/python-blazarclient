@@ -74,6 +74,7 @@ class ComputeHostClientManager(base.BaseClientManager):
             '/os-hosts/%s/allocation' % host_id, body=values)
         return body['allocation']
 
+
     def list_properties(self, detail=False, all=False, sort_by=None):
         url = '/os-hosts/properties'
 

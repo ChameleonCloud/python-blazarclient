@@ -183,6 +183,7 @@ class ShowLease(command.ShowCommand):
         return params
 
 
+
 class CreateLeaseBase(command.CreateCommand):
     """Create a lease."""
     resource = 'lease'

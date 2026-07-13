@@ -249,6 +249,7 @@ class ReallocateHost(command.ReallocateCommand):
         return params
 
 
+
 class ShowHostProperty(command.ShowPropertyCommand):
     """Show host property."""
     resource = 'host'

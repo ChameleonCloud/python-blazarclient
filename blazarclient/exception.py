@@ -97,6 +97,7 @@ class IncorrectNetwork(BlazarClientException):
     code = 409
 
 
+
 class ResourcePropertyNotFound(BlazarClientException):
     """Occurs if the resource property specified does not exist"""
     message = _("The resource property does not exist.")

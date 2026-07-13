@@ -443,7 +443,7 @@ class ReallocateCommand(BlazarCommand):
 
 
 class ShowPropertyCommand(BlazarCommand, show.ShowOne):
-    """Show information of a given resource."""
+    """Show information of a given resource property."""
 
     api = 'reservation'
     resource = None
