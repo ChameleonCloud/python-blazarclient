@@ -17,6 +17,7 @@ import logging
 
 from blazarclient.v1 import devices
 from blazarclient.v1 import allocations
+from blazarclient.v1 import flavor_instances
 from blazarclient.v1 import floatingips
 from blazarclient.v1 import hosts
 from blazarclient.v1 import leases
@@ -78,6 +79,12 @@ class Client(object):
             version=self.version,
             **kwargs)
         self.allocation = allocations.AllocationClientManager(
+            blazar_url=self.blazar_url,
+            auth_token=self.auth_token,
+            session=self.session,
+            version=self.version,
+            **kwargs)
+        self.flavor_instance = flavor_instances.FlavorInstanceClientManager(
             blazar_url=self.blazar_url,
             auth_token=self.auth_token,
             session=self.session,
